@@ -1,0 +1,191 @@
+/*
+  ============================================================
+  PORTFOLIO STYLESHEET
+  ============================================================
+  This file controls how your page LOOKS (colors, fonts, spacing).
+  index.html controls what your page SAYS (the content).
+
+  Want to change your colors? Edit the values under ":root" below.
+  Every color on the page comes from those few lines.
+  ============================================================
+*/
+
+/* -------- COLOR & FONT SETTINGS (edit these first!) -------- */
+:root {
+  --color-bg:      #ffffff;   /* page background        */
+  --color-text:    #1a1a1a;   /* main text color        */
+  --color-accent:  #2563eb;   /* links & buttons        */
+  --color-muted:   #6b7280;   /* softer/secondary text  */
+  --color-card:    #f3f4f6;   /* project card background */
+
+  --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --max-width: 900px;         /* how wide the content gets */
+}
+
+/* -------- BASE RESETS (leave these alone to start) -------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* -------- NAVIGATION BAR -------- */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;      /* stays at top when you scroll */
+  top: 0;
+  background-color: var(--color-bg);
+}
+
+.nav-logo {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--color-text);
+}
+
+.nav-links a {
+  margin-left: 1.5rem;
+  color: var(--color-text);
+}
+
+/* -------- HERO / INTRO SECTION -------- */
+.hero {
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  color: var(--color-muted);
+  margin-bottom: 2rem;
+}
+
+/* -------- BUTTONS -------- */
+.button {
+  display: inline-block;
+  background-color: var(--color-accent);
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.button:hover {
+  opacity: 0.9;
+  text-decoration: none;
+}
+
+/* -------- GENERAL SECTIONS -------- */
+.section {
+  max-width: var(--max-width);
+  margin: 0 auto;          /* centers the section */
+  padding: 3rem 2rem;
+}
+
+.section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.section h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* -------- SKILLS LIST -------- */
+.skills-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skills-list li {
+  background-color: var(--color-card);
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+/* -------- PROJECT CARDS -------- */
+.project-grid {
+  display: grid;
+  /* Auto-fits as many cards per row as will fit, min 250px wide */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.project-card {
+  background-color: var(--color-card);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.project-card h3 {
+  margin-top: 0;
+}
+
+.project-link {
+  display: inline-block;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+/* -------- CONTACT LIST -------- */
+.contact-list {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* -------- FOOTER -------- */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-muted);
+  border-top: 1px solid #e5e7eb;
+  margin-top: 2rem;
+}
+
+/* -------- MOBILE FRIENDLY -------- */
+/* When the screen is narrow (phones), stack things vertically */
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .nav-links a {
+    margin-left: 0;
+    margin-right: 1rem;
+  }
+  .hero h1 {
+    font-size: 2rem;
+  }
+}
