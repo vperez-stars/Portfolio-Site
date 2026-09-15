@@ -12,7 +12,7 @@
 
 /* -------- COLOR & FONT SETTINGS (edit these first!) -------- */
 :root {
-  --color-bg:      #ffffff;   /* page background        */
+  --color-bg:      #241cff;   /* page background        */
   --color-text:    #1a1a1a;   /* main text color        */
   --color-accent:  #2563eb;   /* links & buttons        */
   --color-muted:   #6b7280;   /* softer/secondary text  */
