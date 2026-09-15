@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Merriweather
+- Font Author: undefined
+- Font Source: https://fonts.gstatic.com/s/merriweather/v33/u-4D0qyriQwlOrhSvowK_l5UcA6zuSYEqOzpPe3HOZJ5eX1WtLaQwmYiScCmDxhtNOKl8yDrOSAqE1f0KvXKYQ.ttf
+- Font License: undefined)
