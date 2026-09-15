@@ -14,8 +14,8 @@
 :root {
   --color-bg:      #66658e;   /* page background        */
   --color-text:    #1a1a1a;   /* main text color        */
-  --color-accent:  #2563eb;   /* links & buttons        */
-  --color-muted:   #6b7280;   /* softer/secondary text  */
+  --color-accent:  #0035a8;   /* links & buttons        */
+  --color-muted:   #0035a8;   /* softer/secondary text  */
   --color-card:    #f3f4f6;   /* project card background */
 
   --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
