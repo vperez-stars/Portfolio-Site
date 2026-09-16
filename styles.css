@@ -14,7 +14,7 @@
 :root {
   --color-bg:      #66658e;   /* page background        */
   --color-text:    #1a1a1a;   /* main text color        */
-  --color-accent:  #0035a8;   /* links & buttons        */
+  --color-accent:  #000b82;   /* links & buttons        */
   --color-muted:   #000b82;   /* softer/secondary text  */
   --color-card:    #f3f4f6;   /* project card background */
 
