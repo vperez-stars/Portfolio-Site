@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- REPLACE: This shows in the browser tab -->
+   <link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="manifest" href="/site.webmanifest">
+  <title>Ventura Perez Del Castillo — Portfolio</title>
+
+  <!-- This links your styles.css file to this page -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
