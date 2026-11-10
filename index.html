@@ -1,143 +1,270 @@
 <!DOCTYPE html>
-<!--
-  ============================================================
-  PORTFOLIO STARTER TEMPLATE
-  ============================================================
-  How to use this file:
-  1. Replace anything in [SQUARE BRACKETS] with your own info.
-  2. Save the file.
-  3. Refresh your browser to see changes.
-
-  Tip: Search for "REPLACE" to find every spot you need to edit.
-  ============================================================
--->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- REPLACE: This shows in the browser tab -->
-   <link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="manifest" href="/site.webmanifest">
   <title>Ventura Perez Del Castillo — Portfolio</title>
+  <meta name="description" content="Ventura Perez Del Castillo is a business analyst, QA and web developer in the Milwaukee area who builds and designs tools: a safety-first route planner, an IT ticket workspace, and a bilingual puzzle about Guernica." />
+  <meta name="theme-color" content="#2e2c55" />
 
-  <!-- This links your styles.css file to this page -->
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,700;0,900;1,700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" />
+
   <link rel="stylesheet" href="styles.css" />
+  <script src="script.js" defer></script>
 </head>
 
 <body>
+  <a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
 
   <!-- ===================== NAVIGATION ===================== -->
-  <nav class="navbar">
-    <!-- REPLACE: your name or a logo/initials -->
-    <a href="#top" class="nav-logo"><i>VP</i>    Ventura Perez</a>
+  <nav class="navbar" aria-label="Main">
+    <a href="#top" class="nav-logo">
+      <span class="monogram" aria-hidden="true">VP</span>
+      <span class="nav-name">Ventura Perez</span>
+    </a>
 
-    <!-- These links jump to sections further down the page -->
-    <div class="nav-links">
-      <a href="#about">About</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="#about" data-i18n="nav.about">About</a>
+        <a href="#projects" data-i18n="nav.projects">Projects</a>
+        <a href="#experience" data-i18n="nav.experience">Experience</a>
+        <a href="#contact" data-i18n="nav.contact">Contact</a>
+      </div>
+      <div class="lang-toggle" role="group" aria-label="Language / Idioma">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="es" aria-pressed="false">ES</button>
+      </div>
     </div>
   </nav>
 
-  <!-- ===================== HERO / INTRO ===================== -->
+  <!-- ===================== HERO ===================== -->
   <header id="top" class="hero">
-    <!-- REPLACE: your name -->
-    <h1>Hi, I'm Ventura Perez Del Castillo</h1>
-
-    <!-- REPLACE: one sentence about who you are -->
-    <p class="tagline"><b>I am a passionate software developer with a focus on 
-      creating meaningful applications that have a positive impact on the world.</b></p>
-
-    <a href="#projects" class="button">See My Work</a>
+    <div class="hero-inner">
+      <p class="eyebrow" data-i18n="hero.eyebrow">Business analyst · QA · Web developer</p>
+      <h1 data-i18n="hero.title">Hi, I'm Ventura.</h1>
+      <p class="lead" data-i18n="hero.lead">I got into code because I wanted to build my own tools, and design them the way I'd want to use them. Now I build web apps that help people get around safely, keep their work organized, and remember what matters.</p>
+      <div class="hero-actions">
+        <a href="#projects" class="button" data-i18n="hero.cta1">See my work</a>
+        <a href="#contact" class="button button-ghost" data-i18n="hero.cta2">Get in touch</a>
+      </div>
+    </div>
   </header>
 
-  <!-- ===================== ABOUT ===================== -->
-  <section id="about" class="section">
-    <h2>About Me</h2>
-    <!-- REPLACE: 2-3 sentences about your background, goals, and what you're learning -->
-    <p>
-      <span style="color: #000000;"></span><b>My name is Ventura, 
-      I am a software developer who wants to make a difference in the world through technology. 
-      I am currently learning web development and have a strong interest in building applications that solve real-world problems. 
-      My goal is to continuously improve my skills and contribute to innovative projects that have a positive impact on society.</span>
-    </b></p>
+  <main id="main">
 
-    <h3>Skills</h3>
-    <!-- REPLACE: add or remove skills as a simple list -->
-    <ul class="skills-list">
-      <li>HTML</li>
-      <li>CSS</li>
-      <li>JavaScript</li>
-      <li>Git &amp; GitHub</li>
-      <li>English and Spanish proficiency</li>
-      <li>Problem-solving and critical thinking</li>
-      <li>Team collaboration and communication</li>
-      <li>Continuous learning and adaptability</li>
-      <li>Python</li>
-      <li>SQL</li>
-      <li>Node.js</li>
-      <li>Rust</li>
-      <li>React</li>
-      <li>Exceptional Sales</li>
-      <li>Customer Service</li>
-      <li>Marketing</li>
-      <li>Project Management</li>
-      <li>Agile Methodologies</li>
-      <li>Waterfall Methodology</li>
-    </ul>
-  </section>
+    <!-- ===================== ABOUT ===================== -->
+    <section id="about" class="section">
+      <h2 data-i18n="about.title">About me</h2>
 
-  <!-- ===================== PROJECTS ===================== -->
-  <section id="projects" class="section">
-    <h2>Projects</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p data-i18n="about.p1">I've always wanted to know how the tools I use actually work, and to make my own when the right one doesn't exist. That's what pulled me into programming. I like the whole process: deciding what a tool should do, designing how it should feel, and building it until it does.</p>
+          <p data-i18n="about.p2">Before tech, I worked in sales. At Park Business Capital in Miami, I went from opening cold leads to closing deals within my first three months, selling at triple the industry average. I also improved the company's sales script, taught veteran colleagues new technology, and trained new hires in sales. Before that, at Domino's in Miami Beach, I planned delivery routes and timed the ovens to keep orders on schedule. (Yes, I was planning routes long before SafeMaps.)</p>
+          <p data-i18n="about.p3">Today I'm a business analyst and QA in i.c.stars, a technology and leadership program in Milwaukee. I build web apps for real client projects, then present them and lead the Q&amp;A on the technical approach and the business value.</p>
+          <p data-i18n="about.p4">I work in English and Spanish, and I build that way too: SafeMaps and my Guernica puzzle both run in both languages.</p>
+        </div>
 
-    <div class="project-grid">
+        <blockquote class="pull-quote">
+          <p data-i18n="about.quote">Technology can help us remember. I built my Guernica puzzle so we never forget the value of peaceful, non-violent action.</p>
+        </blockquote>
+      </div>
 
-      <!-- PROJECT CARD 1 — copy this whole block to add more projects -->
-      <article class="project-card">
-        <!-- REPLACE: project name -->
-        <h3>OneTouch</h3>
-        <!-- REPLACE: 1-2 sentences on what it is and what you built -->
-        <p>Ask questions about IT tickets in plain English, build dashboards, and run a team's ticket work. Demo with generated data.</p>
-        <!-- REPLACE: link to the live site or GitHub repo -->
-        <a href="onetouch/" target="_blank" rel="noopener noreferrer" class="project-link">View Project</a>
-      </article>
+      <h3 class="skills-title" data-i18n="skills.title">What I work with</h3>
+      <div class="skills-groups">
+        <div class="skills-group">
+          <h4 data-i18n="skills.build">Build with</h4>
+          <ul class="skills-list">
+            <li>JavaScript</li>
+            <li>HTML</li>
+            <li>CSS</li>
+            <li>Python</li>
+            <li>Rust</li>
+            <li>SQL</li>
+            <li>React</li>
+            <li>Node.js</li>
+            <li data-i18n="skills.ai">Anthropic API &amp; AI tools</li>
+            <li data-i18n="skills.git">Git &amp; GitHub</li>
+          </ul>
+        </div>
+        <div class="skills-group">
+          <h4 data-i18n="skills.analyze">Analyze &amp; test</h4>
+          <ul class="skills-list">
+            <li data-i18n="skills.ba">Business analysis</li>
+            <li data-i18n="skills.data">Data analysis</li>
+            <li data-i18n="skills.qa">Quality assurance</li>
+            <li data-i18n="skills.office">Microsoft 365 &amp; Excel</li>
+          </ul>
+        </div>
+        <div class="skills-group">
+          <h4 data-i18n="skills.work">How I work</h4>
+          <ul class="skills-list">
+            <li data-i18n="skills.agile">Agile</li>
+            <li data-i18n="skills.waterfall">Waterfall</li>
+            <li>Jira</li>
+            <li data-i18n="skills.pm">Project management</li>
+            <li data-i18n="skills.present">Client presentations</li>
+            <li data-i18n="skills.team">Team collaboration</li>
+            <li data-i18n="skills.problem">Problem-solving &amp; critical thinking</li>
+            <li data-i18n="skills.learning">Continuous learning</li>
+          </ul>
+        </div>
+        <div class="skills-group">
+          <h4 data-i18n="skills.clients">Sales &amp; clients</h4>
+          <ul class="skills-list">
+            <li data-i18n="skills.sales">Sales</li>
+            <li data-i18n="skills.service">Customer service</li>
+            <li data-i18n="skills.relations">Business relations</li>
+            <li data-i18n="skills.marketing">Marketing</li>
+            <li>Salesforce</li>
+            <li>KickSite</li>
+          </ul>
+        </div>
+        <div class="skills-group">
+          <h4 data-i18n="skills.speak">Languages</h4>
+          <ul class="skills-list">
+            <li data-i18n="skills.en">English</li>
+            <li data-i18n="skills.es">Spanish</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-      <!-- PROJECT CARD 2 -->
-      <article class="project-card">
-        <h3>SafeMaps</h3>
-        <p>A route planner that picks the safest way first, then the one that saves fuel, then the fastest, for car, bike, walking and bus trips around Milwaukee. Demo with recorded routes.</p>
-        <a href="safemaps/" target="_blank" rel="noopener noreferrer" class="project-link">View Project</a>
-      </article>
+    <!-- ===================== PROJECTS ===================== -->
+    <section id="projects" class="section">
+      <h2 data-i18n="projects.title">Projects</h2>
+      <p class="section-intro" data-i18n="projects.intro">Things I've built. Each one has a demo you can try.</p>
 
-      <!-- PROJECT CARD 3 -->
-      <article class="project-card">
-        <h3>In Memory of Guernica</h3>
-        <p>A short puzzle that commemorates the bombing of Guernica, providing historical context and educational resources.</p>
-        <a href="https://vperez-stars.github.io/Guernica/" target="_blank" rel="noopener noreferrer" class="project-link">View Project</a>
-      </article>
+      <div class="project-grid">
 
-    </div>
-  </section>
+        <article class="project-card">
+          <a class="project-media" href="safemaps/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <img src="images/safemaps.webp" width="1440" height="900" loading="lazy" alt="" />
+          </a>
+          <div class="project-body">
+            <h3>SafeMaps</h3>
+            <ul class="tags">
+              <li>JavaScript</li><li>Leaflet</li><li>MapLibre</li><li>Three.js</li><li>OpenStreetMap</li>
+            </ul>
+            <p data-i18n="safemaps.desc">Most map apps pick the fastest route. SafeMaps picks the safest one first, then the one that saves fuel, then the quickest, for car, bike, walking and bus trips around Milwaukee.</p>
+            <p class="highlight" data-i18n="safemaps.highlight">It plans routes with its own engine over OpenStreetMap roads and public crash data. On one sample trip, the safer route scores 100 for safety against the standard route's 26, for about 7 more minutes.</p>
+            <p class="note" data-i18n="safemaps.note">Demo with recorded routes.</p>
+            <a href="safemaps/" target="_blank" rel="noopener noreferrer" class="project-link" data-i18n="link.demo">Try the demo</a>
+          </div>
+        </article>
 
-  <!-- ===================== CONTACT ===================== -->
-  <section id="contact" class="section">
-    <h2>Get In Touch</h2>
-    <p><span style="color: #000000;"><b>Want to work together or just say hi? Reach out.</b></span></p>
+        <article class="project-card">
+          <a class="project-media" href="onetouch/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <img src="images/onetouch.webp" width="1440" height="900" loading="lazy" alt="" />
+          </a>
+          <div class="project-body">
+            <h3>OneTouch</h3>
+            <ul class="tags">
+              <li>JavaScript</li><li>Node.js</li><li>Claude API</li><li>PostgreSQL</li><li>Three.js</li>
+            </ul>
+            <p data-i18n="onetouch.desc">An IT ticket workspace: ask questions about tickets in plain English, build your own dashboards, and see which work needs attention first.</p>
+            <p class="highlight" data-i18n="onetouch.highlight">It maps its own architecture in 2D and 3D, so you can follow a real request through the whole system, step by step.</p>
+            <p class="note" data-i18n="onetouch.note">Demo with generated data.</p>
+            <a href="onetouch/" target="_blank" rel="noopener noreferrer" class="project-link" data-i18n="link.demo">Try the demo</a>
+          </div>
+        </article>
 
-    <ul class="contact-list">
-      <!-- REPLACE: your real links. Delete any you don't use. -->
-      <li><a href="mailto:[vperez@icstars.org]" target="_blank" rel="noopener noreferrer">Email</a></li>
-      <li><a href="https://www.github.com/vperez-stars" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-      <li><a href="https://www.linkedin.com/in/ventura-perez/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-    </ul>
-  </section>
+        <article class="project-card">
+          <a class="project-media guernica-art" href="https://vperez-stars.github.io/Guernica/" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <span class="pieces">
+              <i></i><i></i><i></i><i></i><i></i><i class="missing"></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i>
+              <i></i><i></i><i></i><i></i><i></i><i></i>
+            </span>
+            <span class="guernica-label">Guernica<small>26 · IV · 1937</small></span>
+          </a>
+          <div class="project-body">
+            <h3 data-i18n="guernica.title">In Memory of Guernica</h3>
+            <ul class="tags">
+              <li>JavaScript</li><li>Canvas</li><li data-i18n="tags.bilingual">Bilingual ES/EN</li>
+            </ul>
+            <p data-i18n-html="guernica.desc">An 18-piece jigsaw of Picasso's <i>Guernica</i>. Every piece you place unlocks a chapter of the Spanish Civil War and its poets (Lorca, Alberti, Cernuda, Guillén and Aleixandre) in Spanish and English.</p>
+            <p class="highlight" data-i18n="guernica.why">Why I made it: the bombing of Guernica shows what violence costs, and why peaceful, non-violent action is worth remembering. I wanted people to rebuild that memory with their own hands, one piece at a time.</p>
+            <p class="note" data-i18n-html="guernica.note">Built for a tech expo. Picasso painted <i>Guernica</i> for one too: the 1937 Paris International Exposition, devoted to arts and technology.</p>
+            <a href="https://vperez-stars.github.io/Guernica/" target="_blank" rel="noopener noreferrer" class="project-link" data-i18n="link.puzzle">Play the puzzle</a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===================== EXPERIENCE ===================== -->
+    <section id="experience" class="section">
+      <h2 data-i18n="exp.title">Experience</h2>
+
+      <ol class="timeline">
+        <li class="job">
+          <div class="job-head">
+            <h3 data-i18n="exp.ics.role">Business Analyst, Quality Assurance</h3>
+            <span class="job-dates" data-i18n="exp.ics.dates">Aug – Dec 2026</span>
+          </div>
+          <p class="job-org">i.c.stars · <span data-i18n="exp.ics.place">Milwaukee, WI</span></p>
+          <ul>
+            <li data-i18n="exp.ics.1">Build web apps for real client projects, combining programming, business analysis and leadership.</li>
+            <li data-i18n="exp.ics.2">Present solutions to rooms of clients and lead the Q&amp;A on the technical approach and the business value.</li>
+            <li data-i18n="exp.ics.3">Deliver projects in Agile and Waterfall, tracking work in Jira and GitHub.</li>
+          </ul>
+        </li>
+
+        <li class="job">
+          <div class="job-head">
+            <h3 data-i18n="exp.park.role">Sales Closer</h3>
+            <span class="job-dates" data-i18n="exp.park.dates">Aug – Oct 2024</span>
+          </div>
+          <p class="job-org">Park Business Capital · <span data-i18n="exp.park.place">Miami, FL</span></p>
+          <ul>
+            <li data-i18n="exp.park.1">Promoted from cold-lead opener to closer within three months, selling at triple the industry average.</li>
+            <li data-i18n="exp.park.2">Improved the company's sales script and shared it with the team.</li>
+            <li data-i18n="exp.park.3">Taught veteran colleagues new technology and trained new hires in sales techniques.</li>
+          </ul>
+        </li>
+
+        <li class="job">
+          <div class="job-head">
+            <h3 data-i18n="exp.dominos.role">Customer Service Representative</h3>
+            <span class="job-dates" data-i18n="exp.dominos.dates">Jul – Oct 2022</span>
+          </div>
+          <p class="job-org">Domino's Pizza · <span data-i18n="exp.dominos.place">Miami Beach, FL</span></p>
+          <ul>
+            <li data-i18n="exp.dominos.1">Planned delivery routes and coordinated bake timing to keep orders on schedule.</li>
+            <li data-i18n="exp.dominos.2">Managed inventory, ran the register and closed the store.</li>
+          </ul>
+        </li>
+      </ol>
+
+      <p class="cert"><span class="cert-badge" aria-hidden="true">A+</span> <span data-i18n="exp.cert">CompTIA A+ certified (May 2023)</span></p>
+    </section>
+
+    <!-- ===================== CONTACT ===================== -->
+    <section id="contact" class="section contact">
+      <h2 data-i18n="contact.title">Get in touch</h2>
+      <p data-i18n="contact.text">Want to build something together, or just say hola? Reach out.</p>
+      <p class="contact-where" data-i18n="contact.where">Based in the Milwaukee area.</p>
+
+      <ul class="contact-list">
+        <li><a class="button" href="mailto:vperez@icstars.org" data-i18n="contact.email">Email me</a></li>
+        <li><a class="button button-outline" href="https://github.com/vperez-stars" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+        <li><a class="button button-outline" href="https://www.linkedin.com/in/ventura-perez/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+      </ul>
+    </section>
+
+  </main>
 
   <!-- ===================== FOOTER ===================== -->
   <footer class="footer">
-    <!-- REPLACE: your name -->
-    <p>&copy; 2026 Ventura Perez Del Castillo. Built with HTML, CSS, and GitHub Pages.</p>
+    <p><span data-i18n="footer.text">Designed and built by hand, one commit at a time.</span> &copy; 2026 Ventura Perez Del Castillo.</p>
   </footer>
 
 </body>
