@@ -1,0 +1,2949 @@
+/* Safe Route Planner: a panel of trip controls and results beside the map. */
+
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --surface-2: #f6f8fa;
+  --text: #15191e;
+  --muted: #5b6573;
+  --subtle: #8a94a3;
+  --border: #e2e6eb;
+  --border-strong: #cdd3db;
+  --accent: #0b7a53; /* the recommended route */
+  --accent-strong: #086444;
+  --accent-soft: #e7f5ee;
+  --drive: #1a4f8b;
+  --drive-strong: #143e6e;
+  --risk: #d93025; /* risky turns */
+  --risk-soft: #fdecea;
+  --warn-soft: #fff6e6;
+  --focus: #2b6fe0;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  --shadow: 0 4px 14px rgba(16, 24, 40, 0.1), 0 1px 3px rgba(16, 24, 40, 0.06);
+  --shadow-lg: 0 18px 40px rgba(16, 24, 40, 0.2);
+
+  /* Icons, drawn with CSS masks in the text's color: buttons keep them when their text changes. */
+  --icon-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E");
+  --icon-navigate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5 20 21l-8-4-8 4z'/%3E%3C/svg%3E");
+  --icon-locate: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='7'/%3E%3Ccircle cx='12' cy='12' r='2.5' fill='black'/%3E%3Cpath d='M12 2v3M12 19v3M2 12h3M19 12h3'/%3E%3C/svg%3E");
+  --icon-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9.5'/%3E%3Cpath d='M12 11v6'/%3E%3Ccircle cx='12' cy='7.5' r='1.2' fill='black' stroke='none'/%3E%3C/svg%3E");
+  --icon-phone: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Crect x='6' y='2.5' width='12' height='19' rx='3'/%3E%3Cpath d='M11 18h2'/%3E%3C/svg%3E");
+  --icon-shield: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.5 4.5 5.5v6c0 4.6 3.2 8.4 7.5 10 4.3-1.6 7.5-5.4 7.5-10v-6z'/%3E%3Cpath d='m8.8 12 2.2 2.2 4.3-4.4'/%3E%3C/svg%3E");
+  --icon-undo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 14 4 9l5-5'/%3E%3Cpath d='M4 9h10.5a5.5 5.5 0 0 1 0 11H11'/%3E%3C/svg%3E");
+  --icon-layers: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'%3E%3Cpath d='m12 3 9 5-9 5-9-5z'/%3E%3Cpath d='m3 13 9 5 9-5'/%3E%3C/svg%3E");
+  --icon-swap: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 4v16M3 8l4-4 4 4M17 20V4M13 16l4 4 4-4'/%3E%3C/svg%3E");
+  --icon-globe: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.1' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9.5'/%3E%3Cpath d='M2.5 12h19M12 2.5c2.6 2.8 3.9 6 3.9 9.5s-1.3 6.7-3.9 9.5c-2.6-2.8-3.9-6-3.9-9.5s1.3-6.7 3.9-9.5z'/%3E%3C/svg%3E");
+  --icon-city: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 21.5V10l6-3v14.5M9 21.5V3h8v18.5M17 21.5V11l4 2v8.5M1.5 21.5h21'/%3E%3C/svg%3E");
+  --icon-plus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+  --icon-clock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9.5'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E");
+  --icon-thumb: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10v11H3V10zM7 10l4-7c1.7 0 2.8 1.4 2.4 3L12.8 10H19a2 2 0 0 1 2 2.3l-1.2 7A2 2 0 0 1 17.8 21H7'/%3E%3C/svg%3E");
+  --icon-turn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 21v-8a4 4 0 0 1 4-4h10M15 4l5 5-5 5'/%3E%3C/svg%3E");
+  --icon-bear: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 21v-7c0-1 .4-2 1.2-2.8L18 3M11 3h7v7'/%3E%3C/svg%3E");
+  --icon-uturn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 21V9a5 5 0 0 1 10 0v8M12 13l5 5 5-5'/%3E%3C/svg%3E");
+  --icon-ahead: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21V4M6 10l6-6 6 6'/%3E%3C/svg%3E");
+  --icon-bars: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.8' stroke-linecap='round'%3E%3Cpath d='M5 20v-7M12 20V4M19 20V9'/%3E%3C/svg%3E");
+  --icon-sliders: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M3 7h10M19 7h2M3 17h2M11 17h10'/%3E%3Ccircle cx='16' cy='7' r='3'/%3E%3Ccircle cx='8' cy='17' r='3'/%3E%3C/svg%3E");
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6573' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  /* The page has no dark theme; this keeps the place search boxes light too. */
+  color-scheme: light;
+  font-family: system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Rules like .setup { display: grid } would otherwise override the hidden attribute. */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(340px, 420px) 1fr;
+  height: 100vh;
+}
+
+/* ---- The panel */
+
+.panel {
+  position: relative;
+  z-index: 1; /* its shadow falls on the map */
+  background: var(--surface);
+  box-shadow: 1px 0 0 var(--border), 4px 0 18px rgba(16, 24, 40, 0.06);
+  overflow-y: auto;
+  padding: 22px 22px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  scrollbar-width: thin;
+}
+
+.panel__header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand__mark {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  color: var(--accent);
+  filter: drop-shadow(0 2px 4px rgba(11, 122, 83, 0.3));
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+}
+
+.tagline {
+  margin: 2px 0 0;
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.header-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.chip:hover {
+  background: var(--accent-soft);
+  border-color: #bfe0cf;
+}
+
+.chip::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  background: var(--accent);
+  mask: var(--icon) center / contain no-repeat;
+  -webkit-mask: var(--icon) center / contain no-repeat;
+}
+
+.chip--info {
+  --icon: var(--icon-info);
+}
+
+.chip--phone {
+  --icon: var(--icon-phone);
+}
+
+.chip--lang {
+  --icon: var(--icon-globe);
+}
+
+.chip--game {
+  --icon: var(--icon-shield);
+}
+
+.chip--city {
+  --icon: var(--icon-city);
+}
+
+.chip--answers {
+  --icon: var(--icon-thumb);
+}
+
+.chip--stats {
+  --icon: var(--icon-bars);
+}
+
+.chip--control {
+  --icon: var(--icon-sliders);
+}
+
+.chip--back {
+  --icon: var(--icon-arrow);
+}
+
+/* A chip without an icon of its own shows none; one that's a link isn't underlined. */
+.chip:not([class*="chip--"])::before {
+  content: none;
+}
+
+a.chip {
+  text-decoration: none;
+}
+
+.trip {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* The start and the destination, joined by a dotted line like a route. */
+
+.trip-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+}
+
+.stop {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.stops {
+  display: contents; /* stop rows sit in the card's column between A and B */
+}
+
+/* From under each pin down to the next one, whatever its row holds. */
+.stop--a::after,
+.stop--via::after {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 30px;
+  bottom: -7px;
+  border-left: 2px dotted var(--border-strong);
+}
+
+.stop .pin {
+  margin-top: 1px;
+}
+
+.stop__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.stop__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.stop__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-weight: 600;
+  font-size: 0.86rem;
+  color: var(--text);
+}
+
+.prefs {
+  display: grid;
+  gap: 12px;
+}
+
+.search gmp-place-autocomplete {
+  width: 100%;
+  color-scheme: light;
+}
+
+.picked {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.picked:empty {
+  display: none;
+}
+
+.hint {
+  margin: -4px 2px 0;
+  font-size: 0.78rem;
+  color: var(--subtle);
+}
+
+select,
+.osm-search {
+  width: 100%;
+  min-height: 44px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background-color: var(--surface);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+select {
+  padding: 8px 38px 8px 12px;
+  appearance: none;
+  background-image: var(--chevron);
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  cursor: pointer;
+}
+
+select:hover,
+.osm-search:hover {
+  border-color: var(--subtle);
+}
+
+select:focus-visible,
+.osm-search:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px rgba(43, 111, 224, 0.2);
+}
+
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+}
+
+/* Switches: a checkbox drawn as a sliding toggle, still a checkbox to keyboards and screen readers. */
+
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.switch__track {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  transition: background 0.18s;
+}
+
+.switch__track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.18s;
+}
+
+.switch input:checked + .switch__track {
+  background: var(--accent);
+}
+
+.switch input:checked + .switch__track::after {
+  transform: translateX(16px);
+}
+
+.switch input:focus-visible + .switch__track {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.voice {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ---- Buttons */
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 10px 18px;
+  font: inherit;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.05s;
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button::before {
+  content: none;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  mask: var(--icon) center / contain no-repeat;
+  -webkit-mask: var(--icon) center / contain no-repeat;
+}
+
+.button--primary {
+  --icon: var(--icon-arrow);
+  flex: 1;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(11, 122, 83, 0.3);
+}
+
+.button--primary::before,
+.button--drive::before,
+.recenter::before,
+.undo::before {
+  content: "";
+}
+
+.button--primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+/* While finding routes, the arrow turns into a spinner. */
+.button.is-busy::before {
+  mask: none;
+  -webkit-mask: none;
+  background: none;
+  border: 2.5px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.button--ghost {
+  background: transparent;
+}
+
+.button--ghost:hover {
+  background: var(--surface-2);
+}
+
+.button--drive {
+  --icon: var(--icon-navigate);
+  width: 100%;
+  background: var(--drive);
+  border-color: var(--drive);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(26, 79, 139, 0.3);
+}
+
+.button--drive:hover {
+  background: var(--drive-strong);
+}
+
+.driving .button--drive {
+  background: var(--surface);
+  color: var(--drive);
+  box-shadow: none;
+}
+
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--drive);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+#locate,
+.add-stop {
+  --icon: var(--icon-locate);
+}
+
+#swap {
+  --icon: var(--icon-swap);
+}
+
+.add-stop {
+  --icon: var(--icon-plus);
+  align-self: flex-start;
+  margin: 2px 0 2px 34px;
+}
+
+#locate::before,
+#swap::before,
+.add-stop::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  mask: var(--icon) center / contain no-repeat;
+  -webkit-mask: var(--icon) center / contain no-repeat;
+}
+
+.link-button--remove {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+.link-button:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.button:focus-visible,
+.chip:focus-visible,
+.link-button:focus-visible,
+.route:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.pin {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 0 0 3px var(--surface-2);
+}
+
+.pin--a {
+  background: var(--accent);
+}
+
+.pin--b {
+  background: #c5221f;
+}
+
+.pin--via {
+  background: #475569;
+}
+
+.map-pin--stop {
+  background: #475569;
+}
+
+/* Tucked-away controls. */
+
+.advanced {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.advanced summary,
+.legend summary,
+.layers summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.advanced summary::-webkit-details-marker,
+.legend summary::-webkit-details-marker,
+.layers summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced summary {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.advanced summary::after,
+.legend summary::after,
+.layers summary::after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background: var(--chevron) center / contain no-repeat;
+  transition: transform 0.15s;
+}
+
+.advanced[open] summary::after,
+.legend[open] summary::after,
+.layers[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.advanced[open] summary {
+  margin-bottom: 12px;
+}
+
+.advanced .toggles {
+  margin-top: 12px;
+}
+
+/* ---- Results */
+
+.results:empty {
+  display: none;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 0;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* A progress message (not an error) spins. */
+.results > .status:not(.status--error, .status--stale)::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid var(--border-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* The routes shown are for the trip before a change on the map. */
+.status--stale {
+  margin-top: 0;
+  background: #fff4e0;
+  color: #7a4a00;
+}
+
+.status--error {
+  background: var(--risk-soft);
+  color: #8a1c14;
+}
+
+/* What the safety score counts, folded under the recommendation. */
+.breakdown {
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+
+.breakdown summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--drive);
+}
+
+.breakdown__table {
+  width: 100%;
+  margin-top: 8px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.breakdown__table th,
+.breakdown__table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+
+.breakdown__table tbody th,
+.breakdown__table tfoot th {
+  text-align: left;
+  font-weight: 500;
+}
+
+.breakdown__table thead th {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.breakdown__table tfoot th,
+.breakdown__table tfoot td {
+  border-bottom: none;
+  font-weight: 700;
+}
+
+.breakdown__total th,
+.breakdown__total td {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.breakdown__note,
+.breakdown__none {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* The last trips planned here, one click to plan again. */
+.recent summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.recent__list {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent__trip {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recent__trip:hover {
+  background: var(--surface-2);
+}
+
+.winner {
+  margin-top: 8px;
+  padding: 16px;
+  border: 1px solid #bfe0cf;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--accent-soft), var(--surface) 70%);
+  box-shadow: var(--shadow-sm);
+}
+
+.winner__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* The safety score: a ring filled to the score, in green, amber or red. */
+.score {
+  --band: var(--accent);
+  flex: none;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, var(--surface) 78%, transparent 80%),
+    conic-gradient(var(--band) calc(var(--score) * 1%), var(--border) 0);
+  line-height: 1;
+}
+
+.score strong {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--band);
+}
+
+.score span {
+  margin-top: 2px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Doubled classes: these must win over .score-pill's own color, which comes later. */
+.score.score--mid,
+.score-pill.score-pill--mid {
+  --band: #c47a00;
+}
+
+.score.score--low,
+.score-pill.score-pill--low {
+  --band: var(--risk);
+}
+
+.score-pill {
+  --band: var(--accent);
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1.5px solid var(--band);
+  color: var(--band);
+  font-size: 0.72rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  vertical-align: 1px;
+}
+
+/* Visitors' answers, under the recommendation. */
+.feedback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #cfe8db;
+  font-size: 0.86rem;
+}
+
+.feedback__question {
+  flex: 1;
+  font-weight: 600;
+}
+
+.feedback__thanks {
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.chip--yes,
+.chip--no {
+  --icon: var(--icon-thumb);
+}
+
+.chip--no::before {
+  transform: rotate(180deg);
+}
+
+.chip--clock {
+  --icon: var(--icon-clock);
+  align-self: flex-start;
+}
+
+/* Weather alerts, above the recommendation. */
+.alert {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border-left: 4px solid #c47a00;
+  background: var(--warn-soft);
+  font-size: 0.86rem;
+}
+
+.alert p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+/* Best time to leave. */
+.leave-times__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.leave-time {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.leave-time:hover {
+  border-color: var(--border-strong);
+}
+
+.leave-time--best {
+  border-color: #bfe0cf;
+  background: var(--accent-soft);
+}
+
+.leave-time__when {
+  font-weight: 650;
+}
+
+.leave-time__why {
+  grid-row: 2;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.leave-time__numbers {
+  grid-row: 1 / 3;
+  grid-column: 2;
+  align-self: center;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Demo mode's banner over the map. */
+.demo-banner {
+  position: absolute;
+  z-index: 1000;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 12px 22px;
+  border-radius: var(--radius-lg);
+  background: rgba(8, 100, 68, 0.94);
+  color: #fff;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: rise 0.25s ease-out;
+}
+
+.demo-banner strong {
+  font-size: 1.05rem;
+}
+
+.demo-banner span {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.demo-switch {
+  margin-top: 12px;
+}
+
+.winner__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+  padding: 3px 9px 3px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.winner__badge::before {
+  content: "";
+  width: 13px;
+  height: 13px;
+  background: currentColor;
+  mask: var(--icon-shield) center / contain no-repeat;
+  -webkit-mask: var(--icon-shield) center / contain no-repeat;
+}
+
+.winner__title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.winner__kind {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.winner__reason {
+  margin: 10px 0 0;
+  font-weight: 600;
+}
+
+.override {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* the panel is narrow: two tiles a row keep "23 min (est.)" on one line */
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.stats dt {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stats dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.results__heading {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.routes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.route {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 12px 12px 12px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.route:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.route--active {
+  border-color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* The route's color on the map, as a bar down its left edge. */
+.swatch {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+}
+
+.route__name {
+  font-weight: 650;
+}
+
+.route__reason {
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.route__numbers {
+  text-align: right;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.route__numbers > div:first-child {
+  color: var(--text);
+  font-weight: 650;
+}
+
+.risky {
+  color: var(--risk);
+  font-weight: 600;
+}
+
+.notes {
+  margin: 0;
+  padding: 10px 12px 10px 28px;
+  border-radius: var(--radius);
+  background: var(--warn-soft);
+  font-size: 0.82rem;
+}
+
+.usage {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--subtle);
+}
+
+/* ---- The map and what floats on it */
+
+.map-wrap {
+  position: relative;
+  z-index: 0; /* keeps the map's own layers under the panel's shadow */
+  height: 100%;
+  min-height: 0;
+}
+
+/* Sized with height, not position: absolute; the map script sets position: relative on this div. */
+.map {
+  width: 100%;
+  height: 100%;
+  background: #e5e9ed;
+}
+
+/* Floating cards over the map: white, slightly see-through, softly shadowed. */
+.legend,
+.layers,
+.nav-banner,
+.recenter,
+.undo,
+.credit {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.credit {
+  position: absolute;
+  left: 10px;
+  bottom: 28px;
+  margin: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.setup {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg);
+}
+
+.setup__card {
+  max-width: 560px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 22px 26px;
+  line-height: 1.55;
+}
+
+.setup__card code {
+  background: var(--surface-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.map-pin {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  border: 2.5px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.map-pin > span {
+  transform: rotate(45deg); /* keep the letter upright inside the rotated pin */
+}
+
+.map-pin--origin {
+  background: var(--accent);
+}
+
+.map-pin--destination {
+  background: #c5221f;
+}
+
+/* Driving: a glanceable banner, the car, and a way back after looking around. */
+
+.nav-banner {
+  position: absolute;
+  z-index: 1000;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 12px 22px;
+  border-radius: var(--radius-lg);
+  background: rgba(20, 62, 110, 0.94);
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  white-space: pre-line; /* the next turn, then what's left, on its own line */
+  box-shadow: var(--shadow-lg);
+}
+
+.recenter {
+  --icon: var(--icon-locate);
+  position: absolute;
+  z-index: 1000;
+  right: 14px;
+  bottom: 110px;
+  min-height: 42px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--drive);
+  box-shadow: var(--shadow);
+}
+
+/* Takes back the last map click or removed pin. */
+.undo {
+  --icon: var(--icon-undo);
+  position: absolute;
+  z-index: 1000;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  min-height: 42px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.undo:active:not(:disabled) {
+  transform: translateX(-50%) translateY(1px);
+}
+
+.driving .undo {
+  display: none;
+}
+
+/* The cross in the middle of the map, while it has keyboard focus: where Enter and S put points.
+   Not after a click: the map takes focus then too (data-input, set in app.js). */
+.crosshair {
+  display: none;
+  position: absolute;
+  z-index: 900;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background:
+    linear-gradient(var(--focus), var(--focus)) center / 3px 100% no-repeat,
+    linear-gradient(var(--focus), var(--focus)) center / 100% 3px no-repeat;
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 1px #fff);
+}
+
+[data-input="keys"] .map-wrap:has(#map:focus, #map :focus) .crosshair {
+  display: block;
+}
+
+/* Read by screen readers, not shown. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Pins move with a drag and come off the map with a click. */
+.map-pin {
+  cursor: grab;
+}
+
+/* The standard route's risky turns that the recommended route avoids: a ring, not a dot. */
+.turn-dot--avoided {
+  background: #fff;
+  border: 3px solid var(--risk);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 1px 3px rgba(0, 0, 0, 0.3);
+  opacity: 0.9;
+}
+
+/* Railroad crossings (a crossbuck) and schools (a school sign's yellow) along the routes. */
+.spot {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.3);
+  color: #202124;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  transform: translateY(50%); /* centered on the spot */
+}
+
+.spot--rail {
+  border-radius: 50%;
+  background: #fff;
+  border-color: #202124;
+}
+
+.spot--rail::before {
+  content: "✕";
+}
+
+.spot--school {
+  border-radius: 4px;
+  background: #f2c200;
+}
+
+.spot--school::before {
+  content: "S";
+}
+
+.spot--avoided {
+  opacity: 0.5;
+  border-style: dashed;
+}
+
+.legend .spot {
+  width: 16px;
+  height: 16px;
+  margin: 0 6px;
+  font-size: 9px;
+  transform: none;
+}
+
+.car {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1a73e8;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 6px rgba(26, 115, 232, 0.25), 0 1px 4px rgba(0, 0, 0, 0.4);
+  transform: translateY(50%); /* centered on the position, not standing on it */
+}
+
+/* A wedge pointing up (north) from the dot, rotated to the heading. */
+.car__arrow {
+  position: absolute;
+  inset: -14px;
+}
+
+.car__arrow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 10px solid #1a73e8;
+}
+
+.event-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  transform: translateY(50%) rotate(45deg); /* a diamond, centered on the spot */
+}
+
+.event-dot--closed {
+  background: #202124;
+}
+
+.event-dot--lanes {
+  background: #e37400;
+}
+
+.event-dot--hazard {
+  background: #7b4fd6;
+  border-radius: 50%;
+}
+
+.turn-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--risk);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+/* Closures crowded together on the OpenStreetMap map: one marker with their count.
+   Qualified with Leaflet's class: its stylesheet loads later and sets display: block. */
+.leaflet-marker-icon.cluster {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #202124;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* A marker's details, opened by a click or tap. */
+.popup strong {
+  display: block;
+  font-size: 0.92rem;
+}
+
+.popup p {
+  margin: 4px 0 0;
+  max-width: 260px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* The map key: what the lines and markers mean. */
+
+.legend {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1000; /* over the map's own layers and controls */
+  max-width: calc(100% - 80px);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+  font-size: 0.8rem;
+}
+
+.legend summary {
+  font-weight: 650;
+}
+
+.legend__items {
+  margin: 8px 0 2px;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--border);
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.legend__items li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.key {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.key--winner {
+  background: var(--accent);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgba(0, 0, 0, 0.15);
+}
+
+.key--standard {
+  height: 0;
+  border-top: 3px dashed #4a5a6a;
+  border-radius: 0;
+}
+
+.key--alternative {
+  background: #a9b2bc;
+}
+
+.key--closed {
+  background: #202124;
+}
+
+.key--lanes {
+  height: 0;
+  border-top: 3px dashed #e37400;
+  border-radius: 0;
+}
+
+.key--hazard {
+  background: #7b4fd6;
+  opacity: 0.75;
+}
+
+.key--cluster {
+  width: 20px;
+  height: 20px;
+  margin: 0 4px;
+  border-radius: 50%;
+  background: #202124;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.key--turn {
+  width: 12px;
+  height: 12px;
+  margin: 0 8px;
+  border-radius: 50%;
+  background: var(--risk);
+}
+
+.key--buses {
+  background: linear-gradient(90deg, #00b451 0 25%, #0055b8 25% 50%, #ff8300 50% 75%, #863399 75%);
+  height: 4px;
+}
+
+.key--avoided {
+  background: #fff;
+  border: 2.5px solid var(--risk);
+}
+
+.key--traffic {
+  background: linear-gradient(90deg, #2e9e5b, #f2a600, #d93025, #7a1b14);
+}
+
+.driving .legend {
+  display: none; /* the banner and the road come first while driving */
+}
+
+/* Map layers: the map's look, and what to show over it. Top left, clear of Leaflet's zoom buttons. */
+
+.layers {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 1000;
+  max-width: calc(100% - 80px);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+  font-size: 0.8rem;
+}
+
+.map-osm .layers {
+  left: 58px;
+}
+
+.layers summary {
+  font-weight: 650;
+}
+
+.layers summary::before {
+  content: "";
+  width: 15px;
+  height: 15px;
+  background: currentColor;
+  mask: var(--icon-layers) center / contain no-repeat;
+  -webkit-mask: var(--icon-layers) center / contain no-repeat;
+}
+
+.layers__body {
+  display: grid;
+  gap: 10px;
+  margin: 8px 0 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.layers__base {
+  display: flex;
+  margin: 0;
+  padding: 2px;
+  border: none;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.layers__base legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.layers__base label {
+  position: relative;
+  flex: 1;
+  cursor: pointer;
+}
+
+.layers__base input {
+  position: absolute;
+  opacity: 0;
+}
+
+.layers__base span {
+  display: block;
+  padding: 5px 10px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.layers__base input:checked + span {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+.layers__base input:focus-visible + span {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.layers__details {
+  display: grid;
+  gap: 8px;
+}
+
+.layers .switch {
+  font-size: 0.82rem;
+}
+
+/* Credits that only apply to the OpenStreetMap map (TomTom's traffic). */
+body:not(.map-osm) .osm-only {
+  display: none;
+}
+
+/* The dark map: light for dark, with colors kept (water stays blue, parks green). Only the base map: routes and pins stay as drawn. */
+
+.map-tiles--dark {
+  filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9);
+}
+
+/* Leaflet's own controls and popups, in the same style. */
+
+.leaflet-bar {
+  border: none !important;
+  border-radius: var(--radius) !important;
+  overflow: hidden;
+  box-shadow: var(--shadow) !important;
+}
+
+.leaflet-bar a {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+.leaflet-container .leaflet-control-attribution {
+  border-top-left-radius: 8px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 0.68rem;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 16px !important;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+/* ---- Dialogs: how it works, and the link for phones */
+
+.dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: 85vh;
+  border: none;
+  border-radius: 20px;
+  padding: 24px 28px;
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.dialog[open] {
+  animation: rise 0.18s ease-out;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.dialog::backdrop {
+  background: rgba(15, 20, 26, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.dialog h2 {
+  margin: 0 40px 10px 0;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+}
+
+.dialog h3 {
+  margin: 18px 0 6px;
+  font-size: 0.95rem;
+}
+
+.dialog ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.dialog li + li {
+  margin-top: 3px;
+}
+
+.dialog__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dialog__close:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+#about-results {
+  margin-top: 18px;
+  padding: 4px 16px 12px;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+}
+
+.dialog__credits {
+  margin-bottom: 0;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.dialog--narrow {
+  width: min(380px, calc(100vw - 32px));
+  text-align: center;
+}
+
+.qr {
+  width: 240px;
+  height: 240px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  image-rendering: pixelated;
+}
+
+.qr__link {
+  word-break: break-all;
+  font-size: 0.85rem;
+}
+
+/* ---- Place search on the OpenStreetMap map (Photon) */
+
+.lf-icon {
+  background: none;
+  border: none;
+}
+
+.lf-anchor {
+  position: absolute;
+  transform: translate(-50%, -100%);
+}
+
+.osm-search {
+  padding: 10px 12px;
+}
+
+.osm-search::placeholder {
+  color: var(--subtle);
+}
+
+.search {
+  position: relative;
+}
+
+.osm-suggestions {
+  position: absolute;
+  z-index: 1000;
+  left: 0;
+  right: 0;
+  margin: 6px 0 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+}
+
+.osm-suggestions li {
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+
+.osm-suggestions li:hover,
+.osm-suggestions li[aria-selected="true"] {
+  background: var(--accent-soft);
+}
+
+/* ---- The expo's stats screen (stats.html): big numbers for across the booth */
+
+.stats-page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.board {
+  display: grid;
+  gap: 28px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 36px 40px;
+}
+
+.board__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.board .brand__mark {
+  width: 56px;
+  height: 56px;
+}
+
+.board h1 {
+  font-size: 2.2rem;
+}
+
+.board .tagline {
+  font-size: 1.1rem;
+}
+
+.board__updated {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.board__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.board__side .chip--back::before {
+  transform: scaleX(-1);
+}
+
+.board__tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.tile strong {
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.tile span {
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+.tile--lead {
+  grid-column: span 2;
+  background: linear-gradient(180deg, var(--accent-soft), var(--surface) 80%);
+}
+
+.tile--lead strong {
+  font-size: clamp(3rem, 7vw, 5.6rem);
+}
+
+.tile--answers strong {
+  color: var(--drive);
+}
+
+.tile .tile__detail {
+  font-size: 0.95rem;
+}
+
+.board__footer {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+
+.board__qr img {
+  display: block;
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius);
+}
+
+@media (max-width: 900px) {
+  .board {
+    padding: 20px 16px;
+  }
+
+  .board__tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .board__header {
+    flex-wrap: wrap;
+  }
+
+  .board__side {
+    align-items: flex-start;
+  }
+}
+
+/* ---- Visitors' answers (answers.html), on the stats screen's board */
+
+.answers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .answers {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.answers__day h2 {
+  margin: 0 0 12px;
+  font-size: 1.3rem;
+}
+
+.answers__numbers {
+  display: grid;
+  gap: 14px;
+}
+
+.answers__table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+}
+
+.answers__table th,
+.answers__table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+
+.answers__table thead th {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  vertical-align: bottom;
+}
+
+.answers__table th:first-child {
+  text-align: left;
+}
+
+.answers__table tbody tr:last-child > * {
+  border-bottom: none;
+}
+
+.answers__note {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* ---- Modes (bike.js, transit.js): controls for some modes only (data-modes), the switch, stress bars */
+
+body[data-mode="car"] [data-modes]:not([data-modes~="car"]),
+body[data-mode="bike"] [data-modes]:not([data-modes~="bike"]),
+body[data-mode="walk"] [data-modes]:not([data-modes~="walk"]),
+body[data-mode="transit"] [data-modes]:not([data-modes~="transit"]) {
+  display: none !important;
+}
+
+.mode {
+  display: flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+
+.mode label {
+  position: relative;
+  flex: 1;
+  cursor: pointer;
+}
+
+.mode input {
+  position: absolute;
+  opacity: 0;
+}
+
+.mode span {
+  display: block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.mode input:checked + span {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.mode input:focus-visible + span {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.stress {
+  margin-top: 12px;
+}
+
+.stress-bar {
+  display: flex;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.route .stress-bar {
+  height: 6px;
+  margin-top: 6px;
+}
+
+.stress__key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.stress__key li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stress__key .key {
+  width: 14px;
+  height: 8px;
+}
+
+.key--stress {
+  background: linear-gradient(90deg, #1a9850, #8bbd2a, #f08c00, #d7191c);
+}
+
+.key--walk {
+  background: linear-gradient(90deg, #1a9850, #8bbd2a, #f08c00, #d7191c);
+}
+
+.key--bus {
+  height: 6px;
+  background: linear-gradient(90deg, #00a650 50%, #863399 50%);
+}
+
+.key--bus-walk {
+  width: 20px;
+  height: 0;
+  border-top: 3px dotted #4a5a6a;
+  border-radius: 0;
+}
+
+/* ---- Transit trips (transit.js) */
+
+.bus-chip {
+  display: inline-block;
+  min-width: 2.2em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.85em;
+  text-align: center;
+  color: #fff;
+}
+
+.bus-chip--light {
+  color: #111;
+}
+
+.bus-chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.bus-chips__then {
+  color: var(--muted);
+  font-size: 0.8em;
+}
+
+.legs {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.leg {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3.6em 1fr;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.leg__time {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+.leg__body {
+  border-left: 4px dotted #8a96a3;
+  padding-left: 10px;
+}
+
+.leg--ride .leg__body {
+  border-left-style: solid;
+}
+
+.leg__title {
+  font-weight: 600;
+}
+
+.leg__detail {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.leg__wait {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.leg__wait--dark {
+  color: var(--risk);
+}
+
+.transit-stop {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--stop-color, #1a73e8);
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+}
+
+.layers__hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* ---- "Which route is safer?" (game.html) */
+
+.game__round {
+  display: grid;
+  gap: 12px;
+}
+
+.game__trip {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.game__choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.game__pick {
+  color: #fff;
+  border: none;
+}
+
+.game__pick--a {
+  background: #1a73e8;
+}
+
+.game__pick--b {
+  background: #9334e6;
+}
+
+.game__pick:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.game__verdict {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.game__verdict--right {
+  color: var(--accent);
+}
+
+.game__verdict--wrong {
+  color: #8a1c14;
+}
+
+.game__tally {
+  margin: 0;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.game__key {
+  position: absolute;
+  z-index: 1000;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 14px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.game__key > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game__key--a {
+  background: #1a73e8;
+}
+
+.game__key--b {
+  background: #9334e6;
+}
+
+/* ---- The expo's control page (control.html) */
+
+.control-page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.control {
+  display: grid;
+  gap: 18px;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px 20px 40px;
+}
+
+.control .brand__mark {
+  width: 44px;
+  height: 44px;
+}
+
+.control__card {
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.control__card h2 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.control__checks {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.control__check {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.control__check strong {
+  color: var(--text);
+}
+
+.control__check::before {
+  flex: none;
+  width: 1.2em;
+  font-weight: 800;
+}
+
+.control__check--ok::before {
+  content: "✓";
+  color: var(--accent);
+}
+
+.control__check--no::before {
+  content: "!";
+  color: var(--risk);
+}
+
+.control__usage {
+  display: grid;
+  gap: 14px;
+}
+
+.control__meter {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+}
+
+.control__meter-numbers {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.control__bar {
+  grid-column: 1 / -1;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--meter) calc(var(--share) * 100%), var(--surface-2) 0);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.control__meter--low {
+  --meter: var(--accent);
+}
+
+.control__meter--mid {
+  --meter: #c47a00;
+}
+
+.control__meter--high {
+  --meter: var(--risk);
+}
+
+.control__today {
+  margin: 0 0 12px;
+}
+
+.control__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.control__message {
+  min-height: 1.2em;
+  margin: 10px 0;
+  color: var(--muted);
+}
+
+.control__code {
+  max-width: 320px;
+}
+
+.control__code input {
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  font: inherit;
+}
+
+.control__links {
+  margin: 14px 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* ---- Phones: the map on top, the panel below */
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 50vh 1fr;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .panel {
+    order: 2;
+    box-shadow: 0 -1px 0 var(--border), 0 -6px 18px rgba(16, 24, 40, 0.08);
+    padding: 20px 16px 24px;
+  }
+
+  .map-wrap {
+    order: 1;
+    height: 50vh;
+  }
+
+  .nav-banner {
+    font-size: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---- The third-person view while driving a car (drive3d.js) */
+
+/* Offered beside "Start driving", and only until the drive begins. */
+#drive[hidden] + #preview,
+.driving #preview {
+  display: none;
+}
+
+.drive-view {
+  position: absolute;
+  inset: 0;
+  z-index: 900;
+  overflow: hidden;
+  background: #cfe0ec;
+}
+
+.drive-view[hidden] {
+  display: none;
+}
+
+/* MapLibre makes its map position: relative, so this one sizes itself rather than by its edges. */
+.drive-view__map {
+  width: 100%;
+  height: 100%;
+}
+
+.driving3d #map .leaflet-control-container {
+  display: none;
+}
+
+.drive-car {
+  position: absolute;
+  left: 50%;
+  top: 75%;
+  width: clamp(64px, 11vmin, 104px);
+  transform: translate(-50%, -62%);
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+}
+
+.driving3d .layers,
+.driving3d .recenter {
+  display: none;
+}
+
+/* Nothing to paint under the view. And a blur over a map that moves every frame costs frames. */
+.driving3d #map {
+  visibility: hidden;
+}
+
+.driving3d .nav-banner {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.drive-road {
+  position: absolute;
+  left: 50%;
+  top: calc(75% + 34px);
+  transform: translateX(-50%);
+  max-width: min(70%, 420px);
+  margin: 0;
+  padding: 6px 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(20, 62, 110, 0.94);
+  color: #fff;
+  font-size: 0.95rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: var(--shadow);
+}
+
+.drive-road span {
+  opacity: 0.8;
+  font-size: 0.8rem;
+}
+
+.road-sign-spot {
+  pointer-events: none;
+}
+
+/* Grows from the foot of its pole, so the sign stays planted on the road. */
+.road-sign {
+  --pole: 20px;
+  position: relative;
+  transform-origin: 50% calc(100% + var(--pole));
+  margin-bottom: var(--pole);
+  animation: sign-comes-up 0.5s ease-out;
+}
+
+@keyframes sign-comes-up {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The pole. */
+.road-sign::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 3px;
+  height: var(--pole);
+  transform: translateX(-50%);
+  background: #5b6573;
+}
+
+.road-sign--stop {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+}
+
+.road-sign--stop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #c8201b;
+  clip-path: polygon(29% 0, 71% 0, 100% 29%, 100% 71%, 71% 100%, 29% 100%, 0 71%, 0 29%);
+}
+
+.road-sign--stop span {
+  position: relative;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* All three lamps alike: the color of a real light isn't known. */
+.road-sign--signal {
+  display: grid;
+  gap: 2px;
+  width: 16px;
+  padding: 3px;
+  border-radius: 4px;
+  background: #1c2127;
+}
+
+.road-sign--signal i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e5484d;
+}
+
+.road-sign--signal i:nth-child(2) {
+  background: #f2b632;
+}
+
+.road-sign--signal i:nth-child(3) {
+  background: #30a46c;
+}
+
+.road-sign--turn {
+  --pole: 30px;
+  width: 58px;
+  height: 58px;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  background: var(--drive);
+}
+
+.road-sign--turn i,
+.drive-hud__turn i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  mask: var(--arrow) center / 78% no-repeat;
+  -webkit-mask: var(--arrow) center / 78% no-repeat;
+}
+
+.road-sign--turn-right,
+.road-sign--turn-left {
+  --arrow: var(--icon-turn);
+}
+
+.road-sign--bear-right,
+.road-sign--bear-left {
+  --arrow: var(--icon-bear);
+}
+
+.road-sign--uturn-right,
+.road-sign--uturn-left {
+  --arrow: var(--icon-uturn);
+}
+
+.road-sign--ahead {
+  --arrow: var(--icon-ahead);
+}
+
+.road-sign--turn-left i,
+.road-sign--bear-left i,
+.road-sign--uturn-right i {
+  transform: scaleX(-1);
+}
+
+.drive-hud {
+  position: absolute;
+  left: 12px;
+  bottom: 38px; /* clear of the map's credit */
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  max-width: calc(50% - 60px);
+}
+
+.drive-hud p {
+  margin: 0;
+}
+
+.drive-hud__turn {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--drive);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+
+.drive-hud__turn[hidden],
+.drive-hud__ahead[hidden] {
+  display: none;
+}
+
+.drive-hud__turn i {
+  width: 56px;
+  height: 56px;
+}
+
+.drive-hud__ahead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 7px 12px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow);
+  font-size: 0.95rem;
+}
+
+.drive-hud__ahead i {
+  width: 14px;
+  height: 14px;
+  background: #1c2127;
+  border-radius: 50%;
+}
+
+.drive-hud__ahead[data-kind="stop"] i {
+  background: #c8201b;
+  border-radius: 0;
+  clip-path: polygon(29% 0, 71% 0, 100% 29%, 100% 71%, 71% 100%, 29% 100%, 0 71%, 0 29%);
+}
+
+.drive-hud__preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 6px 4px 10px;
+  border-radius: var(--radius);
+  background: #1c2127;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.drive-hud__preview span {
+  margin-right: 6px;
+}
+
+.drive-hud__preview button {
+  min-width: 32px;
+  min-height: 30px;
+  padding: 0 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.drive-hud__preview button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.drive-hud__preview button[aria-pressed="true"] {
+  background: #fff;
+  color: #1c2127;
+}
+
+/* The dial turns with the car, so its red mark points north; the middle says which way the car is going. */
+.drive-compass {
+  position: absolute;
+  right: 12px;
+  bottom: 38px;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  box-shadow: var(--shadow);
+}
+
+.drive-compass__dial {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.drive-compass strong {
+  grid-area: 1 / 1;
+  position: relative;
+  color: var(--text);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.drive-hud__note {
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 760px) {
+  .driving3d .layout {
+    grid-template-rows: 74vh 1fr;
+  }
+
+  .driving3d .map-wrap {
+    height: 74vh;
+  }
+
+  /* One row of speeds: wider than the cards below it, which keep their width and stay clear of the car. */
+  .drive-hud {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .drive-hud__preview {
+    flex-wrap: nowrap;
+    width: max-content;
+    padding: 4px;
+  }
+
+  .drive-hud__preview span {
+    display: none;
+  }
+
+  /* Clear of the cards at the bottom left. */
+  .drive-road {
+    top: 112px;
+    max-width: calc(100% - 24px);
+  }
+}

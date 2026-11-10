@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Safe Route Planner Demo</title>
+    <meta name="description" content="A route planner that puts safety first, then fuel, then time. A portfolio demo with routes recorded from the real engine.">
+    <meta name="theme-color" content="#0b7a53" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230b7a53'/%3E%3Cpath d='M10.5 22.5c0-4.2 3.2-5.3 5.5-6s5.5-1.8 5.5-6' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='10.5' cy='22.5' r='2.7' fill='white'/%3E%3Ccircle cx='21.5' cy='10.5' r='2.7' fill='white'/%3E%3C/svg%3E"
+    />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icons/icon-180.png" />
+    <meta name="apple-mobile-web-app-title" content="Safe Routes" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="demo/demo.js"></script>
+    <style>
+      .chip--answers, .chip--stats, .chip--control, #bike-stress-switch, details.advanced { display: none !important; }
+      #demo-toast { position: fixed; left: 50%; bottom: 18px; transform: translate(-50%, 20px); max-width: min(560px, calc(100vw - 32px));
+        background: #1f2a33; color: #fff; padding: 10px 16px; border-radius: 12px; font: 14px/1.45 system-ui, sans-serif;
+        box-shadow: 0 6px 24px rgba(0,0,0,.25); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 10000; }
+      #demo-toast.demo-toast--on { opacity: 1; transform: translate(-50%, 0); }
+      .demo-pill { position: fixed; right: 12px; bottom: 12px; z-index: 9000; padding: 5px 12px; border-radius: 999px;
+        background: rgba(20,28,34,.82); color: #fff; font: 12px/1.4 system-ui, sans-serif; text-decoration: none; }
+      .demo-pill:hover, .demo-pill:focus-visible { background: #000; }
+      @media (max-width: 760px) { .demo-pill { position: static; display: block; border-radius: 0; text-align: center; padding: 8px 16px; font-size: 13px; } }
+      #demo-intro { max-width: min(560px, calc(100vw - 32px)); border: 0; border-radius: 16px; padding: 22px 24px; box-shadow: 0 12px 40px rgba(0,0,0,.3);
+        font: 15px/1.5 system-ui, sans-serif; color: #1f2a33; }
+      #demo-intro::backdrop { background: rgba(10,20,30,.45); }
+      #demo-intro h2 { margin: 0 0 6px; font-size: 20px; color: #0b7a53; }
+      #demo-intro p { margin: 8px 0; }
+      #demo-intro ul { list-style: none; padding: 0; margin: 10px 0 14px; display: grid; gap: 6px; }
+      #demo-intro li a { font-weight: 600; color: #0b7a53; }
+      #demo-intro li span { display: block; font-size: 13px; color: #55636f; }
+      #demo-intro .demo-note { font-size: 13px; color: #55636f; }
+      #demo-intro button { font: inherit; font-weight: 600; padding: 8px 16px; border-radius: 10px; border: 0; background: #0b7a53; color: #fff; cursor: pointer; }
+    </style>
+  </head>
+  <body data-mode="car">
+    <a class="demo-pill" href="../" title="Back to the portfolio">← Portfolio · demo with recorded routes</a>
+    <dialog id="demo-intro" aria-labelledby="demo-intro-title">
+      <h2 id="demo-intro-title">Safe Route Planner</h2>
+      <p>Most map apps pick the <em>fastest</em> route. This one picks the <strong>safest</strong> one first, then the one that uses the least fuel, then the quickest.
+        It counts what makes a drive risky: turns across traffic at busy or crash-prone junctions, school zones, railroad crossings, closures and driving into a low sun, and it shows what the safer route avoids compared with the standard one.</p>
+      <p>It plans car, bike, walking and bus trips around Milwaukee on its own router over OpenStreetMap roads, using public crash data and work zones.</p>
+      <p><strong>Try a trip:</strong></p>
+      <ul>
+            <li><a href="./?from=43.0451%2C-87.9172&amp;fromName=Fiserv+Forum&amp;to=43.0225%2C-88.013&amp;toName=State+Fair+Park&amp;mode=car">Fiserv Forum → State Fair Park</a><span>By car: the safer route scores 100 for safety against the standard route's 26, for about 7 more minutes.</span></li>
+            <li><a href="./?from=43.0766%2C-87.8814&amp;fromName=UW-Milwaukee&amp;to=42.9978%2C-87.8954&amp;toName=Bay+View&amp;mode=car">UW-Milwaukee → Bay View</a><span>By car: the safer route scores 100 for safety against the standard route's 37, for about 9 more minutes.</span></li>
+            <li><a href="./?from=43.118%2C-87.91&amp;fromName=Bayshore&amp;to=43.0451%2C-87.9172&amp;toName=Fiserv+Forum&amp;mode=bike">Bayshore → Fiserv Forum</a><span>By bike: the lowest-stress streets and trails, with busy crossings marked.</span></li>
+            <li><a href="./?from=43.0451%2C-87.9172&amp;fromName=Fiserv+Forum&amp;to=42.9978%2C-87.8954&amp;toName=Bay+View&amp;mode=transit">Fiserv Forum → Bay View</a><span>By bus: walk, ride and walk, with the safest option first.</span></li>
+      </ul>
+      <p class="demo-note">This copy runs without its server: routes between 12 sample places were recorded from the real engine, so points you set move to the nearest sample place. The map, layers, directions and the 3D drive preview run live in your browser.</p>
+      <form method="dialog"><button type="submit">Start exploring</button></form>
+    </dialog>
+    <script>
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var seen = false;
+        try { seen = sessionStorage.getItem("safemaps-intro") === "seen"; sessionStorage.setItem("safemaps-intro", "seen"); } catch (e) {}
+        var box = document.getElementById("demo-intro");
+        if (!params.has("from") && !seen && box && box.showModal) box.showModal();
+      })();
+    </script>
+    <main class="layout">
+      <aside class="panel" aria-label="Trip planner">
+        <header class="panel__header">
+          <div class="brand">
+            <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+              <rect width="32" height="32" rx="9" fill="currentColor" />
+              <path d="M10.5 22.5c0-4.2 3.2-5.3 5.5-6s5.5-1.8 5.5-6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" />
+              <circle cx="10.5" cy="22.5" r="2.7" fill="#fff" />
+              <circle cx="21.5" cy="10.5" r="2.7" fill="#fff" />
+            </svg>
+            <div>
+              <h1>Safe Route Planner</h1>
+              <p class="tagline">Safety first, then fuel, then time.</p>
+            </div>
+          </div>
+          <nav class="header-links" aria-label="About this app">
+            <button id="about-open" class="chip chip--info" type="button" aria-haspopup="dialog">How it works</button>
+            <button id="phone-open" class="chip chip--phone" type="button" aria-haspopup="dialog">Open on your phone</button>
+            <a class="chip chip--game" href="game.html">Which route is safer?</a>
+            <a class="chip chip--city" href="city.html">Inside the app</a>
+            <button id="lang" class="chip chip--lang" type="button" translate="no" lang="es">Español</button>
+          </nav>
+        </header>
+
+        <section class="trip" aria-label="Trip">
+          <div id="mode" class="mode" role="radiogroup" aria-label="How you're going" hidden>
+            <label><input type="radio" name="mode" value="car" checked /><span>Car</span></label>
+            <label hidden><input type="radio" name="mode" value="bike" /><span>Bike</span></label>
+            <label hidden><input type="radio" name="mode" value="walk" /><span>Walk</span></label>
+            <label hidden><input type="radio" name="mode" value="transit" /><span>Transit</span></label>
+          </div>
+          <div class="trip-card">
+            <div class="stop stop--a">
+              <span class="pin pin--a" aria-hidden="true">A</span>
+              <div class="stop__body">
+                <div class="stop__head">
+                  <span class="stop__label" id="origin-label">Start</span>
+                  <button id="locate" class="link-button" type="button">Use my location</button>
+                </div>
+                <div id="origin-search" class="search"></div>
+                <p id="origin-picked" class="picked"></p>
+              </div>
+            </div>
+            <div id="stops" class="stops"></div>
+            <div class="stop stop--b">
+              <span class="pin pin--b" aria-hidden="true">B</span>
+              <div class="stop__body">
+                <div class="stop__head">
+                  <span class="stop__label" id="destination-label">Destination</span>
+                  <button id="swap" class="link-button" type="button" title="Swap the start and destination">Swap</button>
+                </div>
+                <div id="destination-search" class="search"></div>
+                <p id="destination-picked" class="picked"></p>
+              </div>
+            </div>
+            <button id="add-stop" class="link-button add-stop" type="button" data-modes="car bike walk">Add a stop</button>
+          </div>
+          <p class="hint">
+            Search for one of the 12 sample places, or click near one on the map: the first click sets the start, the next the destination. Drag a pin to move it, click it to remove it; <strong>Undo</strong> on the map
+            takes a change back. With the keyboard, Tab to the map: Enter puts a point at the cross in the middle.
+          </p>
+          <details id="recent" class="recent" hidden>
+            <summary>Recent trips</summary>
+            <ul id="recent-list" class="recent__list"></ul>
+            <button id="recent-clear" class="link-button" type="button">Forget these trips</button>
+          </details>
+
+          <div class="prefs">
+            <div class="field" data-modes="car">
+              <label class="field__label" for="profile">Driver profile</label>
+              <select id="profile"></select>
+            </div>
+            <div class="field" data-modes="bike">
+              <label class="field__label" for="bike-profile">Rider</label>
+              <select id="bike-profile">
+                <option value="everyday" selected>Most adults: some traffic is OK</option>
+                <option value="family">Family: the quietest streets, even if longer</option>
+                <option value="confident">Confident: busier streets are fine</option>
+                <option value="ebike">E-bike: like most adults, but faster</option>
+              </select>
+            </div>
+            <div class="field" data-modes="walk">
+              <label class="field__label" for="walk-profile">Walker</label>
+              <select id="walk-profile">
+                <option value="everyday" selected>Most people: a short detour for a calmer walk</option>
+                <option value="careful">Careful: slower, the calmest streets</option>
+                <option value="stepfree">Step-free: no stairs, for a wheelchair or stroller</option>
+              </select>
+            </div>
+            <div class="field" data-modes="car">
+              <label class="field__label" for="extra-time">Extra time you'd accept for a safer route</label>
+              <select id="extra-time">
+                <option value="" selected>No fixed limit</option>
+                <option value="5">Up to 5 minutes</option>
+                <option value="10">Up to 10 minutes</option>
+                <option value="15">Up to 15 minutes</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field__label" for="leave">Leave</label>
+              <select id="leave">
+                <option value="0" selected>Now</option>
+                <option value="15">In 15 minutes</option>
+                <option value="30">In 30 minutes</option>
+                <option value="60">In 1 hour</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="toggles">
+            <label class="switch"><input type="checkbox" id="closures-layer" checked /><span class="switch__track"></span>Show closures</label>
+          </div>
+
+          <div class="actions">
+            <button id="find" class="button button--primary" type="button" disabled>Find route</button>
+            <button id="clear" class="button button--ghost" type="button">Clear</button>
+          </div>
+          <button id="drive" class="button button--drive" type="button" hidden>Start driving</button>
+          <button id="preview" class="button button--ghost" type="button" data-modes="car">Preview the drive</button>
+          <label class="switch voice"><input type="checkbox" id="voice" checked /><span class="switch__track"></span>Spoken directions while driving</label>
+
+          <details class="advanced">
+            <summary>Advanced</summary>
+            <div class="field">
+              <label class="field__label" for="road-events">Closures and slowdowns</label>
+              <select id="road-events">
+                <option value="auto" selected>Automatic (best available)</option>
+                <option value="wzdx">Wisconsin work zones (WZDx)</option>
+                <option value="wi511">Wisconsin 511 (official)</option>
+                <option value="tomtom">TomTom traffic (every street)</option>
+                <option value="google">Traffic speeds along routes</option>
+                <option value="apify">Traffic tiles (paid)</option>
+                <option value="off">None</option>
+              </select>
+            </div>
+            <div class="toggles">
+              <label class="switch"><input type="checkbox" id="live-traffic" checked /><span class="switch__track"></span>Live traffic</label>
+              <label class="switch"><input type="checkbox" id="use-router" checked /><span class="switch__track"></span>Our router</label>
+            </div>
+            <label class="switch demo-switch">
+              <input type="checkbox" id="auto-replan" /><span class="switch__track"></span>Plan again after each change on the map
+            </label>
+            <label class="switch demo-switch">
+              <input type="checkbox" id="demo-mode" /><span class="switch__track"></span>Demo mode: show sample trips when no one's using it
+            </label>
+          </details>
+        </section>
+
+        <section id="results" class="results" aria-live="polite"></section>
+      </aside>
+
+      <section class="map-wrap">
+        <div
+          id="map"
+          class="map"
+          role="application"
+          aria-label="Map. Arrow keys move it, plus and minus zoom. Enter puts the start, then the destination, at the middle; S adds a stop there; Control Z undoes."
+        ></div>
+        <div class="crosshair" aria-hidden="true"></div>
+        <p id="map-status" class="visually-hidden" role="status"></p>
+        <p id="nav-banner" class="nav-banner" role="status" hidden></p>
+        <p id="demo-banner" class="demo-banner" role="status" hidden></p>
+        <button id="recenter" class="button recenter" type="button" hidden>Re-center</button>
+        <button id="undo" class="button undo" type="button" hidden>Undo</button>
+        <details id="layers" class="layers">
+          <summary>Map layers</summary>
+          <div class="layers__body">
+            <fieldset class="layers__base">
+              <legend>Map type</legend>
+              <label><input type="radio" name="base-map" value="roadmap" checked /><span>Default</span></label>
+              <label><input type="radio" name="base-map" value="satellite" /><span>Satellite</span></label>
+              <label><input type="radio" name="base-map" value="terrain" /><span>Terrain</span></label>
+            </fieldset>
+            <div class="layers__details">
+              <label class="switch"><input type="checkbox" id="traffic-layer" /><span class="switch__track"></span>Traffic</label>
+              <label class="switch"><input type="checkbox" id="transit-layer" /><span class="switch__track"></span>Transit</label>
+              <label class="switch"><input type="checkbox" id="biking-layer" /><span class="switch__track"></span>Biking</label>
+              <label id="bike-stress-switch" class="switch" hidden>
+                <input type="checkbox" id="bike-stress-layer" /><span class="switch__track"></span>Bike stress
+              </label>
+              <p id="stress-hint" class="layers__hint" hidden>Zoom in to see each street's stress.</p>
+              <label class="switch osm-only"><input type="checkbox" id="buses-near" checked /><span class="switch__track"></span>Only buses near the trip</label>
+              <label class="switch">
+                <input type="checkbox" id="dark-at-night" checked /><span class="switch__track"></span>Dark map at night
+              </label>
+            </div>
+          </div>
+        </details>
+        <details id="legend" class="legend" open>
+          <summary>Map key</summary>
+          <ul class="legend__items">
+            <li><span class="key key--winner"></span>Recommended route</li>
+            <li data-modes="car"><span class="key key--standard"></span>Standard (fastest) route</li>
+            <li data-modes="bike walk"><span class="key key--standard"></span>Shortest route</li>
+            <li><span class="key key--alternative"></span>Other routes</li>
+            <li><span class="key key--closed"></span>Road closed</li>
+            <li><span class="key key--lanes"></span>Lane closure</li>
+            <li class="osm-only"><span class="key key--hazard"></span>Weather hazard: fog, ice, flooding</li>
+            <li class="osm-only"><span class="key key--cluster">3</span>Several closures: zoom in</li>
+            <li data-modes="car"><span class="key key--turn"></span>Risky turn across traffic</li>
+            <li data-modes="car"><span class="key key--turn key--avoided"></span>Risky turn the recommended route avoids</li>
+            <li data-modes="car"><span class="key spot spot--rail"></span>Railroad crossing (faded: one it avoids)</li>
+            <li data-modes="car"><span class="key spot spot--school"></span>School zone at school times (faded: one it avoids)</li>
+            <li data-modes="bike walk transit"><span class="key key--turn"></span>Busy crossing without a signal</li>
+            <li data-modes="bike walk transit"><span class="key key--turn key--avoided"></span>Busy crossing the recommended route avoids</li>
+            <li id="legend-traffic" hidden><span class="key key--traffic"></span>Traffic: flowing → jammed</li>
+            <li data-modes="walk transit"><span class="key key--walk"></span>Walking: sidewalk or path → busy street without one</li>
+            <li data-modes="transit"><span class="key key--bus"></span>Bus ride, in the route's color · <span class="key key--bus-walk"></span>walk</li>
+            <li id="legend-stress" hidden><span class="key key--stress"></span>Bike stress: low → very busy</li>
+            <li id="legend-buses" class="osm-only" hidden><span class="key key--buses"></span>Bus routes, each its own color</li>
+          </ul>
+        </details>
+        <div id="drive-view" class="drive-view" hidden>
+          <div id="drive-view-map" class="drive-view__map" role="img" aria-label="The road ahead, seen from behind the car"></div>
+          <svg class="drive-car" viewBox="0 0 120 84" aria-hidden="true">
+            <ellipse cx="60" cy="76" rx="56" ry="7" fill="#000" opacity="0.28" />
+            <path d="M24 34 34 10c1-3 4-5 7-5h38c3 0 6 2 7 5l10 24c8 2 14 8 14 16v16c0 4-3 7-7 7H17c-4 0-7-3-7-7V50c0-8 6-14 14-16Z" fill="#1a4f8b" />
+            <path d="M35 33 42 13c.5-1.5 1.5-2 3-2h30c1.5 0 2.5.5 3 2l7 20Z" fill="#bcd4e6" />
+            <rect x="15" y="44" width="23" height="9" rx="3" fill="#e5484d" />
+            <rect x="82" y="44" width="23" height="9" rx="3" fill="#e5484d" />
+            <rect x="46" y="58" width="28" height="9" rx="2" fill="#f4f6f8" />
+          </svg>
+          <div id="drive-compass" class="drive-compass" role="img" translate="no">
+            <svg id="drive-compass-dial" class="drive-compass__dial" viewBox="0 0 64 64" aria-hidden="true">
+              <circle cx="32" cy="32" r="30" fill="#fff" />
+              <path d="M32 7v5M32 52v5M7 32h5M52 32h5M14.300 14.300l3.500 3.500M46.200 46.200l3.500 3.500M14.300 49.700l3.500-3.500M46.200 17.800l3.500-3.500" stroke="#5b6573" stroke-width="2" stroke-linecap="round" />
+              <path d="M32 3 26.500 13h11Z" fill="#d93025" />
+            </svg>
+            <strong id="drive-compass-point">N</strong>
+          </div>
+          <p id="drive-road" class="drive-road" hidden><span>Now on</span> <strong id="drive-road-name" translate="no"></strong></p>
+          <div class="drive-hud">
+            <div id="drive-preview" class="drive-hud__preview" role="group" aria-label="Preview speed" hidden>
+              <span>Preview</span>
+              <button type="button" data-rate="1" translate="no">1×</button>
+              <button type="button" data-rate="2" translate="no">2×</button>
+              <button type="button" data-rate="3" translate="no">3×</button>
+              <button type="button" data-rate="5" translate="no">5×</button>
+              <button type="button" data-rate="10" translate="no">10×</button>
+            </div>
+            <p id="drive-turn" class="drive-hud__turn" hidden><i></i><span id="drive-turn-distance"></span></p>
+            <p id="drive-ahead" class="drive-hud__ahead" hidden><i></i><strong id="drive-ahead-what"></strong> <span id="drive-ahead-distance"></span></p>
+            <p class="drive-hud__note">Not every stop sign is mapped. Watch the road.</p>
+          </div>
+        </div>
+        <div id="setup" class="setup" hidden></div>
+        <p id="osm-credit" class="credit" hidden></p>
+      </section>
+    </main>
+
+    <dialog id="about" class="dialog" aria-labelledby="about-title">
+      <form method="dialog"><button class="dialog__close" aria-label="Close">×</button></form>
+      <h2 id="about-title">How it works</h2>
+      <p>
+        Most navigation apps pick the fastest route. This one puts your safety first, then fuel, then time: of the
+        routes it finds, the safest wins; among equally safe ones, the one that burns the least fuel; then the fastest.
+      </p>
+      <h3>What makes a route risky</h3>
+      <ul>
+        <li><strong>Turns across oncoming traffic</strong> at busy junctions, less where a traffic signal controls them, more where crashes have happened.</li>
+        <li>
+          <strong>Closed roads and lane closures</strong>, live from Wisconsin's work zones and 511<span class="osm-only">,
+          and TomTom traffic</span>.
+        </li>
+        <li><strong>School zones</strong> at drop-off and pickup times, and <strong>railroad crossings</strong>.</li>
+        <li>
+          <strong>Sun glare:</strong> driving toward a low sun around sunrise and sunset, worked out from where the sun
+          is when you leave.
+        </li>
+        <li><strong>After dark:</strong> turns across traffic count as riskier: oncoming cars are judged by their headlights.</li>
+        <li>
+          <strong>Weather:</strong> National Weather Service alerts<span class="osm-only">, and fog, ice or flooding
+          reported on the roads</span>. On snow and ice, turns across traffic count as riskier.
+        </li>
+      </ul>
+      <p>
+        Each route gets a <strong>safety score</strong> from 0 to 100 that adds these up the same way for everyone:
+        higher is safer.
+      </p>
+      <h3>How the routes are found</h3>
+      <p>
+        Our own router searches Milwaukee's streets for routes that avoid those risks, then compares each with the
+        standard, fastest route. You choose how much extra time a safer route may take, and when you leave: school
+        zones and the sun change with the time.
+      </p>
+      <section id="about-results" hidden>
+        <h3 id="about-results-title">Across Milwaukee test trips</h3>
+        <ul id="about-numbers"></ul>
+        <p id="about-measured" class="dialog__credits"></p>
+      </section>
+      <p class="dialog__credits">
+        Map data © OpenStreetMap contributors. Work zones and incidents: Wisconsin DOT (511).<span class="osm-only">
+        Traffic © TomTom.</span> Crash locations: NHTSA's Fatality Analysis Reporting System, 2020–2024.
+      </p>
+    </dialog>
+
+    <dialog id="phone" class="dialog dialog--narrow" aria-labelledby="phone-title">
+      <form method="dialog"><button class="dialog__close" aria-label="Close">×</button></form>
+      <h2 id="phone-title">Open on your phone</h2>
+      <div id="phone-body"></div>
+    </dialog>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>

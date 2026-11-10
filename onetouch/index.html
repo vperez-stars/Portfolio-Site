@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OneTouch Demo</title>
+    <meta name="description" content="OneTouch: one place to ask questions about IT tickets, build dashboards and run a team's ticket work. A portfolio demo with generated data.">
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+        <link rel="stylesheet" href="style.css">
+    <script>
+        // A signed-in reload starts in the colors this browser last used, so the
+        // default ones don't flash first (customize.js keeps the copy current)
+        try {
+            var saved = sessionStorage.getItem('onetouch-session') && JSON.parse(localStorage.getItem('onetouch-theme') || 'null');
+            if (saved) {
+                var root = document.documentElement;
+                var dark = saved.mode === 'dark' || (saved.mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+                root.dataset.theme = dark ? 'dark' : 'light';
+                root.dataset.header = saved.header || 'dark';
+                if (/^#[0-9a-f]{6}$/i.test(saved.accent)) root.style.setProperty('--accent', saved.accent);
+                if (/^#[0-9a-f]{6}$/i.test(saved.onAccent)) root.style.setProperty('--on-accent', saved.onAccent);
+            }
+        } catch (e) { /* the default colors, until the account's arrive */ }
+        // ♿ This browser's accessibility settings, before anything is drawn
+        // (signed in or not; accessibility.js keeps the copy current)
+        try {
+            var access = JSON.parse(localStorage.getItem('onetouch-access') || 'null');
+            if (access) {
+                ['contrast', 'readable', 'underline', 'focus', 'cursor', 'motion'].forEach(function (k) {
+                    if (access[k] === true) document.documentElement.classList.add('a11y-' + k);
+                });
+                if ([115, 130, 150, 175].indexOf(access.textSize) >= 0) document.documentElement.style.fontSize = access.textSize + '%';
+            }
+        } catch (e) { /* the defaults, until accessibility.js starts */ }
+    </script>
+</head>
+<body class="signed-out">
+    <style>
+        .demo-note { margin: 28px auto 0; padding: 6px 14px; border-radius: 999px; background: rgba(0,0,0,.55); color: #fff; font-size: 13px; text-align: center; max-width: 100%; }
+        .demo-pill { position: fixed; left: 12px; bottom: 12px; z-index: 50; padding: 5px 12px; border-radius: 999px; background: rgba(20,20,20,.78); color: #fff; font: 12px/1.4 system-ui, sans-serif; text-decoration: none; }
+        .demo-pill:hover, .demo-pill:focus-visible { background: #000; }
+        body.signed-out .demo-pill { display: none; }
+        #drawer-customize { display: none; }
+        .demo-examples { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .demo-examples button { font: inherit; font-size: 12.5px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--border, #ccc); background: var(--bg-secondary, #fff); color: inherit; cursor: pointer; text-align: left; }
+        .demo-examples button:hover { border-color: var(--accent, #a06b1c); }
+    </style>
+    <a class="demo-pill" href="../" title="Back to the portfolio">← Portfolio · demo with generated data</a>
+    <!-- For keyboard users: the first Tab goes here, and Enter skips the header -->
+    <a class="skip-link" href="#main-content">Skip to the page</a>
+    <!-- ♿ on the sign-in page (signed in, it's in the header) -->
+    <button type="button" class="login-access-btn access-btn" onclick="toggleAccessPanel()"
+            aria-controls="access-panel" aria-expanded="false" title="Accessibility (Alt+A)">♿ Accessibility</button>
+    <!-- SIGN-IN PAGE: shown until the user signs in -->
+    <div id="login-view" class="login-page">
+        
+        <p class="demo-note">Portfolio demo · every ticket, team and person here is generated</p>
+        <main class="box">
+            <img src="favicon-32x32.png" alt="" width="32" height="32">
+            <h1>Sign in to OneTouch</h1>
+            <p class="sub">This demo signs you in as a project manager. Any name and password work.</p>
+            <form id="login-form" onsubmit="event.preventDefault(); signIn();">
+                <label for="login-email">Email</label>
+                <div class="combo">
+                    <input id="login-email" type="text" placeholder="your-email" value="jordan.avery" autocomplete="username" required
+                           spellcheck="false" autocapitalize="off">
+                    <span class="suffix">@demo.example</span>
+                </div>
+                <label for="login-password" class="password-label">Password</label>
+                <div class="combo">
+                    <input id="login-password" type="password" placeholder="your-password" value="demo" autocomplete="current-password" required>
+                </div>
+                <p id="login-error" class="login-error" role="alert"></p>
+                <button id="login-btn" class="btn" type="submit">Open the demo</button>
+            </form>
+            <div class="or"><span>or use</span></div>
+            <div class="provs">
+                <button class="prov" type="button" onclick="showLoginError('Microsoft Entra ID sign-in is not available yet. Use your email and password.')"><img src="microsoftlogo.png" alt="" height="24" width="24"> Microsoft Entra ID</button>
+            </div>
+            <p class="foot"><a href="../">← Back to the portfolio</a></p>
+        </main>
+    </div>
+
+    <header class="app-header">
+        <!-- Top left: the logo and name (back to Home), who's signed in, then Home and Dashboards -->
+        <div class="header-left">
+            <h1 class="app-title">
+                <button type="button" class="home-link" onclick="goHome()" title="Back to Home">
+                    <img src="android-chrome-192x192.png" alt="" class="app-logo"> OneTouch
+                </button>
+            </h1>
+            <span id="user-name" class="user-name"></span>
+            <nav class="tab-navigation">
+                <button class="tab-btn" data-tab="home" onclick="goHome()">🏠 Home</button>
+                <button class="tab-btn" data-tab="dashboard" onclick="switchTab('dashboard')">📈 Dashboards</button>
+                <!-- Admins and anyone on a team (teams.js) -->
+                <button class="tab-btn" data-tab="teams" id="teams-tab" onclick="switchTab('teams')" hidden>👥 Team</button>
+                <!-- Admins only (the server refuses anyone else; architecture.mjs) -->
+                <button class="tab-btn" data-tab="architecture" id="architecture-tab" onclick="switchTab('architecture')" aria-label="Architecture" title="Architecture" hidden>🧊<span class="tab-btn-text"> Architecture</span></button>
+            </nav>
+            <!-- The AI assistant: a question typed here is asked in the chat; with nothing typed, the chat opens (app.js) -->
+            <form class="nav-ask" id="nav-ask" role="search" aria-label="Ask Claude about the data" onsubmit="event.preventDefault(); askFromHeader();">
+                <input type="search" id="nav-ask-input" placeholder="Ask Claude about the data…" autocomplete="off" enterkeyhint="send"
+                       aria-label="Ask Claude a question about the data" aria-controls="assistant-panel" aria-expanded="false" maxlength="2000">
+                <button type="button" class="mic-btn" data-mic-for="nav-ask-input" aria-pressed="false"
+                        aria-label="Speak your question" title="Speak your question (Alt+M)">🎤</button>
+                <button type="submit" class="nav-ask-btn" id="nav-ask-btn" title="Ask Claude. With nothing typed, this opens the chat">
+                    💬 Ask<span class="nav-ask-count" id="nav-ask-count" hidden></span>
+                </button>
+            </form>
+        </div>
+        <div class="header-right">
+            <!-- Anyone signed in: tell the admins something's wrong (notifications.js) -->
+            <button type="button" class="header-btn" id="issue-btn" onclick="openIssueDialog()" aria-label="Report a problem" title="Report a problem">🚩</button>
+            <button type="button" class="header-btn notify-btn" id="notify-btn" onclick="toggleNotifications()"
+                    aria-controls="notify-panel" aria-expanded="false" aria-label="Notifications">🔔<span class="notify-count" id="notify-count" hidden></span></button>
+            <button type="button" class="header-btn access-btn" onclick="toggleAccessPanel()"
+                    aria-controls="access-panel" aria-expanded="false" aria-label="Accessibility" title="Accessibility (Alt+A)">♿</button>
+            <button type="button" class="header-btn" id="theme-btn" onclick="toggleThemePanel()"
+                    aria-controls="theme-panel" aria-expanded="false" aria-label="Colors" title="Colors">🎨<span class="header-btn-text"> Colors</span></button>
+            <button class="sign-out-btn" type="button" onclick="signOut()">Sign out</button>
+        </div>
+    </header>
+
+    <!-- 🔔 Notifications: tickets given to you, families moved to your team, members' reports (notifications.js) -->
+    <section class="theme-panel notify-panel" id="notify-panel" role="dialog" aria-label="Notifications" hidden>
+        <div class="theme-panel-head">
+            <span>Notifications</span>
+            <span class="notify-head-actions">
+                <button type="button" class="notify-clear-all" id="notify-clear-all" onclick="clearAllNotifications()" hidden>Clear all</button>
+                <button type="button" class="drawer-close" onclick="toggleNotifications(false)" aria-label="Close">✕</button>
+            </span>
+        </div>
+        <!-- ✉️ These by email too (mail.mjs), for anyone with an address on file -->
+        <div class="notify-email" id="notify-email" hidden>
+            <label><input type="checkbox" id="notify-email-on"> Email me these too</label>
+            <span class="notify-email-to" id="notify-email-to"></span>
+        </div>
+        <div id="notify-list"></div>
+    </section>
+
+    <!-- 🎨 Colors: each person's color scheme, saved to their account (customize.js) -->
+    <section class="theme-panel" id="theme-panel" role="dialog" aria-label="Your colors" hidden>
+        <div class="theme-panel-head">
+            <span>Your colors</span>
+            <button type="button" class="drawer-close" onclick="toggleThemePanel(false)" aria-label="Close">✕</button>
+        </div>
+        <fieldset>
+            <legend>Light or dark</legend>
+            <div class="choice-row" id="theme-modes"></div>
+        </fieldset>
+        <fieldset>
+            <legend>Accent color <span class="legend-note">buttons, the page you're on, and charts</span></legend>
+            <div class="swatch-row">
+                <span id="theme-accents" class="swatch-row"></span>
+                <label class="swatch swatch-custom" title="Any color you like">
+                    <input type="color" id="theme-custom" value="#a06b1c" aria-label="Pick any color">
+                    <span class="swatch-custom-face">＋</span>
+                </label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Header</legend>
+            <div class="choice-row" id="theme-headers"></div>
+        </fieldset>
+        <div class="theme-panel-foot">
+            <span class="theme-note">Saved to your account, so your colors follow you to any computer.</span>
+            <button type="button" class="home-action" onclick="resetTheme()">↺ Default colors</button>
+        </div>
+    </section>
+
+    <!-- ♿ Accessibility: how OneTouch looks, reads aloud and listens, saved to this browser and the account (accessibility.js) -->
+    <section class="theme-panel access-panel" id="access-panel" role="dialog" aria-label="Accessibility" hidden>
+        <div class="theme-panel-head">
+            <span>Accessibility</span>
+            <button type="button" class="drawer-close" onclick="toggleAccessPanel(false)" aria-label="Close">✕</button>
+        </div>
+        <fieldset>
+            <legend>Text size</legend>
+            <div class="choice-row" id="access-sizes"></div>
+        </fieldset>
+        <fieldset>
+            <legend>Seeing the page</legend>
+            <div class="access-switches">
+                <label class="access-switch"><input type="checkbox" data-key="contrast"><span>High contrast<small>Black on white (white on black in dark mode), with strong lines</small></span></label>
+                <label class="access-switch"><input type="checkbox" data-key="readable"><span>Easier-to-read text<small>A plainer typeface, with more space between letters, words and lines</small></span></label>
+                <label class="access-switch"><input type="checkbox" data-key="bionic"><span>Bold word beginnings (like Bionic Reading)<small>The first part of every word in bold, so your eyes move from word to word. Screen reader users may prefer it off.</small></span></label>
+                <div class="choice-row access-row access-indent" id="access-bionic-levels" aria-label="How much of each word is bold"></div>
+                <label class="access-switch"><input type="checkbox" data-key="underline"><span>Underline links and ticket numbers</span></label>
+                <label class="access-switch"><input type="checkbox" data-key="focus"><span>Strong focus outline<small>A thick yellow ring around whatever the keyboard is on</small></span></label>
+                <label class="access-switch"><input type="checkbox" data-key="cursor"><span>Big mouse pointer</span></label>
+                <label class="access-switch"><input type="checkbox" data-key="guide"><span>Reading guide<small>A band across the page that follows the pointer, to keep your place</small></span></label>
+                <label class="access-switch"><input type="checkbox" data-key="motion"><span>Less motion<small>No animations or sliding</small></span></label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Magnifier</legend>
+            <div class="access-switches">
+                <label class="access-switch"><input type="checkbox" data-key="magnifier"><span>Show the text under the pointer, large<small>With the keyboard, the box or button you're on</small></span></label>
+            </div>
+            <div class="choice-row access-row" id="access-magnify" aria-label="How much larger"></div>
+        </fieldset>
+        <fieldset>
+            <legend>Read aloud</legend>
+            <div class="access-switches">
+                <label class="access-switch"><input type="checkbox" data-key="selectRead" data-needs="speech"><span>A Read button when I select text</span></label>
+                <label class="access-switch"><input type="checkbox" data-key="speakAnswers" data-needs="speech"><span>Read Claude's answers to me<small>Every answer also has its own Read button</small></span></label>
+                <label class="access-switch"><input type="checkbox" data-key="speakHover" data-needs="speech"><span>Read what I point at<small>Rest the pointer on any text for a moment</small></span></label>
+            </div>
+            <div class="access-row">
+                <label for="access-voice">Voice</label>
+                <select id="access-voice" data-needs="speech"></select>
+            </div>
+            <div class="access-row">
+                <label for="access-rate">Speed</label>
+                <input type="range" id="access-rate" min="0.5" max="2" step="0.1" data-needs="speech">
+                <span id="access-rate-value">1.0×</span>
+                <button type="button" class="home-action" id="access-try" data-needs="speech">▶ Try it</button>
+            </div>
+            <p class="access-note warn" id="access-speech-none" hidden>This browser can't read aloud. Edge, Chrome and Safari can.</p>
+        </fieldset>
+        <fieldset>
+            <legend>Speak instead of typing</legend>
+            <div class="access-switches">
+                <label class="access-switch"><input type="checkbox" data-key="autoSend" data-needs="dictation"><span>Ask Claude as soon as I stop talking<small>In the Ask bar and the chat; otherwise you press Enter</small></span></label>
+            </div>
+            <p class="access-note">Press 🎤 by the Ask bar or the chat, or <kbd>Alt</kbd>+<kbd>M</kbd> in any text box. Your browser turns the speech into text (Edge uses Microsoft's service, Chrome uses Google's), so it needs the internet and your permission for the microphone.</p>
+            <p class="access-note warn" id="access-dictation-none" hidden>This browser can't take dictation. Use Edge or Chrome.</p>
+        </fieldset>
+        <fieldset>
+            <legend>Keyboard shortcuts</legend>
+            <ul class="access-keys">
+                <li><kbd>/</kbd> the Ask bar</li>
+                <li><kbd>Alt</kbd>+<kbd>A</kbd> this panel</li>
+                <li><kbd>Alt</kbd>+<kbd>R</kbd> read aloud what's selected, pointed at or focused (again to stop)</li>
+                <li><kbd>Alt</kbd>+<kbd>M</kbd> speak into the text box you're in</li>
+                <li><kbd>Esc</kbd> stop reading or listening, close a panel</li>
+                <li><kbd>Tab</kbd> first thing on the page: skip to the page itself</li>
+            </ul>
+        </fieldset>
+        <p class="access-status" id="access-status" role="status"></p>
+        <div class="theme-panel-foot">
+            <span class="theme-note">Kept in this browser and saved to your account.</span>
+            <button type="button" class="home-action" onclick="resetAccess()">↺ Default settings</button>
+        </div>
+    </section>
+
+    <main class="app-content" id="main-content" tabindex="-1">
+        <!-- HOME: welcome, then each person's sections and charts in their order (customize.js) -->
+        <section id="home-view" class="view-panel active">
+            <div class="home" id="home">
+                <div class="home-head">
+                    <h2 class="home-welcome" id="home-welcome">Welcome!</h2>
+                    <div class="home-head-actions">
+                        <button type="button" class="home-action" id="tour-btn" onclick="startTour()" title="A short tour of OneTouch">❔ Tour</button>
+                        <button type="button" class="home-action" id="customize-home-btn" onclick="toggleHomeEditing()" aria-pressed="false">✏️ Customize Home</button>
+                    </div>
+                </div>
+                <!-- While customizing: add charts, bring back hidden sections, reset -->
+                <div class="home-edit-bar" id="home-edit-bar" hidden>
+                    <p class="home-edit-text"><b>Customizing Home.</b> Move or hide sections with their buttons, add charts of your own,
+                        and edit or move a chart with the buttons on it. Changes are saved to your account as you go.</p>
+                    <div class="home-edit-actions">
+                        <button type="button" class="primary-btn" onclick="addHomeChart()">＋ Add a chart</button>
+                        <span class="home-add-back" id="home-add-back"></span>
+                        <button type="button" class="home-action" onclick="resetHomeLayout()">↺ Reset Home</button>
+                        <button type="button" class="home-action" onclick="toggleHomeEditing(false)">✓ Done</button>
+                    </div>
+                </div>
+                <p class="home-status home-empty" id="home-empty" hidden>Your Home page is empty. Click <b>Customize Home</b> to add sections or charts.</p>
+
+                <div class="home-blocks waiting" id="home-blocks">
+                    <!-- Your tickets: the ones assigned to you (as a list and in charts), Ticket results and starred tickets -->
+                    <section class="home-block" data-block="tickets">
+                        <div class="home-modes" role="tablist" aria-label="Your tickets">
+                            <button type="button" role="tab" class="home-mode active" data-mode="assigned" aria-selected="true" aria-controls="home-assigned" onclick="setHomeMode('assigned')">
+                                <span class="home-mode-name">📋 Assigned to me <span class="star-count" id="assigned-count" hidden>0</span></span>
+                                <span class="home-mode-desc">Highest priority first, then oldest</span>
+                            </button>
+                            <button type="button" role="tab" class="home-mode" data-mode="charts" aria-selected="false" aria-controls="home-charts" onclick="setHomeMode('charts')">
+                                <span class="home-mode-name">📊 My charts</span>
+                                <span class="home-mode-desc">The tickets assigned to you, in charts</span>
+                            </button>
+                            <!-- Project managers and admins: their team's families and each one's KPIs -->
+                            <button type="button" role="tab" class="home-mode" data-mode="families" id="kpi-families-tab" aria-selected="false" aria-controls="home-families" onclick="setHomeMode('families')" hidden>
+                                <span class="home-mode-name">👪 Team families <span class="star-count" id="kpi-families-count" hidden>0</span></span>
+                                <span class="home-mode-desc">Each family's KPIs, the most urgent first</span>
+                            </button>
+                            <button type="button" role="tab" class="home-mode" data-mode="results" aria-selected="false" aria-controls="home-results" onclick="setHomeMode('results')">
+                                <span class="home-mode-name">🎫 Ticket results</span>
+                                <span class="home-mode-desc">Every ticket the AI assistant has shown you</span>
+                            </button>
+                            <button type="button" role="tab" class="home-mode" data-mode="starred" aria-selected="false" aria-controls="home-starred" onclick="setHomeMode('starred')">
+                                <span class="home-mode-name">★ Starred tickets <span class="star-count" id="star-count">0</span></span>
+                                <span class="home-mode-desc">Saved to your account</span>
+                            </button>
+                        </div>
+
+                        <div class="home-panel" id="home-assigned" role="tabpanel">
+                            <div class="home-result" id="assigned-result" aria-live="polite"></div>
+                        </div>
+
+                        <div class="home-panel" id="home-charts" role="tabpanel" hidden>
+                            <div class="home-result" id="my-charts-result"></div>
+                        </div>
+
+                        <div class="home-panel" id="home-families" role="tabpanel" hidden>
+                            <div class="home-result" id="kpi-families-result" aria-live="polite"></div>
+                        </div>
+
+                        <div class="home-panel" id="home-results" role="tabpanel" hidden>
+                            <div class="home-result" id="ticket-results" aria-live="polite"></div>
+                        </div>
+
+                        <div class="home-panel" id="home-starred" role="tabpanel" hidden>
+                            <div class="home-result" id="starred-result" aria-live="polite"></div>
+                        </div>
+                    </section>
+
+                    <!-- Your dashboards: shortcuts to the dashboards you built (hidden until added) -->
+                    <section class="home-block" data-block="shortcuts" hidden>
+                        <div class="guide-card shortcuts-card">
+                            <span class="guide-title">Your dashboards</span>
+                            <div class="shortcut-list" id="home-shortcuts"></div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEAM: teams, their people and roles, and who has which ticket (teams.js) -->
+        <section id="teams-view" class="view-panel">
+            <div class="home teams" id="teams"></div>
+        </section>
+
+        <!-- ARCHITECTURE: the 3D map of how OneTouch is built, admins only (architecture.js) -->
+        <section id="architecture-view" class="view-panel">
+            <div class="arch" id="architecture"></div>
+        </section>
+
+        <!-- DASHBOARD VIEW CONTAINER (METABASE, and each person's own dashboards) -->
+        <section id="dashboard-view" class="view-panel">
+            <div class="dashboard-container">
+                <!-- Top-left: the drawer button and which dashboard is showing -->
+                <div class="dashboard-toolbar">
+                    <button type="button" class="drawer-toggle" id="dashboard-drawer-toggle"
+                            aria-controls="dashboard-drawer" aria-expanded="false" onclick="toggleDashboardDrawer()">
+                        <span aria-hidden="true">☰</span> Dashboards
+                    </button>
+                    <!-- Shown on the detail pages a click opens -->
+                    <button type="button" class="dashboard-back" id="dashboard-back" hidden onclick="dashboardBack()">← Back</button>
+                    <div class="dashboard-current">
+                        <span class="dashboard-current-group" id="dashboard-current-group"></span>
+                        <span class="dashboard-current-name" id="dashboard-current-name"></span>
+                        <span class="dashboard-current-desc" id="dashboard-current-desc"></span>
+                    </div>
+                    <!-- On an incident, change or request record: star it -->
+                    <button type="button" class="star-btn labelled" id="dashboard-star" hidden></button>
+                    <span class="dashboard-hint" id="dashboard-hint" hidden>Click a bar, slice, number or blue value for details</span>
+                    <button type="button" class="home-action dashboard-tour-btn" id="dashboard-tour-btn" onclick="startTour('dashboards')"
+                            title="A short tour of the Dashboards page" aria-label="Tour of the Dashboards page">❔<span class="tour-btn-word"> Tour</span></button>
+                </div>
+                <div class="dashboard-body">
+                    <div class="dashboard-backdrop" id="dashboard-backdrop" onclick="toggleDashboardDrawer(false)"></div>
+                    <aside class="dashboard-drawer" id="dashboard-drawer" aria-label="Dashboards">
+                        <div class="drawer-header">
+                            <span>Dashboards</span>
+                            <button type="button" class="drawer-close" onclick="toggleDashboardDrawer(false)" aria-label="Close">✕</button>
+                        </div>
+                        <!-- Pages built into OneTouch itself (families.js) -->
+                        <section class="drawer-group builtin-dashboards">
+                            <h3>Built into OneTouch</h3>
+                            <button type="button" class="dashboard-choice" data-builtin="families" onclick="showFamilies(); toggleDashboardDrawer(false)">
+                                <span class="dashboard-choice-name">👪 Ticket families</span>
+                                <span class="dashboard-choice-desc">Parent tickets and their children. Click any ticket, parent or child, to open it.</span>
+                            </button>
+                        </section>
+                        <!-- The dashboards this person built (customize.js) -->
+                        <section class="drawer-group my-dashboards">
+                            <h3>My dashboards</h3>
+                            <div id="my-dashboards-list"></div>
+                            <button type="button" class="drawer-new" onclick="newBoard()">＋ New dashboard</button>
+                        </section>
+                        <!-- The team dashboards: filled in by app.js from /api/dashboards (built by scripts/metabase-setup.mjs) -->
+                        <nav id="dashboard-picker"></nav>
+                        <div class="drawer-foot">
+                            <p class="drawer-note" id="drawer-hidden-note"></p>
+                            <button type="button" class="drawer-customize" id="drawer-customize" onclick="toggleDrawerEditing()" aria-pressed="false">👁 Show or hide team dashboards</button>
+                        </div>
+                    </aside>
+                    <p class="dashboard-message" id="dashboard-message">Loading dashboards…</p>
+                    <!-- On an incident, change or request record: its family (families.js) -->
+                    <section class="record-family" id="record-family" aria-label="Parent, children and other linked tickets" hidden>
+                        <div class="record-family-head">
+                            <p class="record-family-summary" id="record-family-summary"></p>
+                            <button type="button" class="home-action" id="record-family-toggle" aria-controls="record-family-body" hidden></button>
+                        </div>
+                        <div class="record-family-body" id="record-family-body"></div>
+                    </section>
+                    <iframe id="dashboard-frame" title="Dashboard" hidden></iframe>
+                    <!-- 👪 Ticket families (families.js): every family of one kind, biggest first -->
+                    <div class="families-view" id="families-view" hidden>
+                        <div class="families-kinds" id="families-kinds" role="group" aria-label="Kind of family"></div>
+                        <div class="families-tools">
+                            <form class="families-find" id="families-find" role="search">
+                                <input type="search" id="families-q" placeholder="Find a ticket's families: INC2400123, RITM0612345…" aria-label="Ticket number">
+                                <button type="submit" class="primary-btn">Find</button>
+                            </form>
+                        </div>
+                        <div id="families-list"></div>
+                    </div>
+                    <!-- One of this person's own dashboards -->
+                    <div class="board-view" id="board-view" hidden>
+                        <div class="board-bar">
+                            <button type="button" class="primary-btn" onclick="addBoardChart()">＋ Add a chart</button>
+                            <button type="button" class="home-action" id="board-share-btn" onclick="shareCurrentBoard()">🔗 Share</button>
+                            <button type="button" class="home-action" onclick="renameBoard()">✎ Rename</button>
+                            <button type="button" class="home-action danger" onclick="deleteBoard()">🗑 Delete dashboard</button>
+                        </div>
+                        <!-- Filters for every chart on the dashboard (saved with it) -->
+                        <div class="board-filters" role="group" aria-label="Filters for every chart on this dashboard">
+                            <span class="board-filters-label">Every chart:</span>
+                            <label class="board-filter">Opened <select id="bf-dates"></select></label>
+                            <span class="board-filter" id="bf-range" hidden>
+                                <input type="date" id="bf-from" aria-label="Opened from"> to <input type="date" id="bf-to" aria-label="Opened to">
+                            </span>
+                            <div class="team-picker">
+                                <button type="button" class="home-action" id="bf-team-btn" aria-expanded="false" aria-controls="bf-team-pop">Team: any ▾</button>
+                                <div class="team-pop" id="bf-team-pop" hidden>
+                                    <input type="search" id="bf-team-search" placeholder="Search teams…" aria-label="Search teams">
+                                    <div class="filter-values" id="bf-team-list"></div>
+                                    <p class="team-pop-note">Requests have no team, so their charts ignore this.</p>
+                                    <div class="team-pop-foot">
+                                        <button type="button" class="home-action" id="bf-team-clear">Any team</button>
+                                        <button type="button" class="primary-btn" id="bf-team-done">Done</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="home-action" id="bf-clear" hidden>✕ Clear filters</button>
+                        </div>
+                        <div class="tile-grid" id="board-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI ASSISTANT, opened from the Ask bar in the header; floats over any page, and a click outside it closes it -->
+        <div class="assistant-backdrop" id="assistant-backdrop" onclick="toggleAssistant(false)"></div>
+        <section class="assistant-panel" id="assistant-panel" aria-label="AI Assistant">
+            <div class="assistant-head">
+                <span class="assistant-title">AI Assistant</span>
+                <div class="assistant-head-actions">
+                    <button type="button" class="assistant-minimize" id="chat-history-btn" onclick="toggleChatHistory()" aria-expanded="false" aria-controls="chat-history" title="Your saved chats: open one to see it again and carry on where you left off">Chat History</button>
+                    <button type="button" class="assistant-delete" onclick="deleteChat()" title="Delete this conversation: its questions and answers disappear, it leaves Chat History, and the assistant forgets it">🗑 Delete chat</button>
+                    <button type="button" class="assistant-minimize" onclick="toggleAssistant(false)" title="Close the chat (the conversation is kept; the Ask bar at the top brings it back)">Minimize ▴</button>
+                </div>
+            </div>
+            <div class="chat-container">
+                <!-- Chat History, over the conversation until one is opened -->
+                <div class="chat-history" id="chat-history" hidden>
+                    <div class="chat-history-head">
+                        <span>Chat History</span>
+                        <button type="button" class="drawer-close" onclick="toggleChatHistory(false)" aria-label="Close chat history">✕</button>
+                    </div>
+                    <div class="chat-history-list" id="chat-history-list"></div>
+                </div>
+                <div class="chat-messages" id="chat-log">
+                    <div class="msg system-msg" id="welcome-msg">Hello!</div>
+                    <div class="msg system-msg demo-help">In this demo a scripted stand-in plays the part of Claude, so it understands the kinds of question below best. Try one:
+                        <div class="demo-examples" id="demo-examples"></div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="user-prompt" placeholder="Ask a data question..." aria-label="Ask a data question" onkeydown="if(event.key === 'Enter') sendPrompt()">
+                    <button type="button" class="mic-btn" data-mic-for="user-prompt" aria-pressed="false"
+                            aria-label="Speak your question" title="Speak your question (Alt+M)">🎤</button>
+                    <button id="send-btn" onclick="sendPrompt()">Ask Claude</button>
+                    <button id="new-chat-btn" type="button" onclick="newChat()" title="Start a fresh chat (this one is kept under Chat History)">New chat</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- THE CHART BUILDER: what a chart counts, which ones, grouped by what, and how it's drawn -->
+    <dialog class="builder" id="chart-builder" aria-labelledby="builder-title">
+        <form id="builder-form" class="builder-form">
+            <div class="builder-head">
+                <h2 id="builder-title">Add a chart</h2>
+                <button type="button" class="drawer-close" onclick="closeBuilder()" aria-label="Close">✕</button>
+            </div>
+            <div class="builder-body">
+                <div class="builder-fields">
+                    <p class="builder-note" id="b-note" hidden></p>
+                    <fieldset>
+                        <legend>1. What to count</legend>
+                        <select id="b-source" aria-label="What to count"></select>
+                    </fieldset>
+                    <fieldset>
+                        <legend>2. Which ones</legend>
+                        <div class="choice-row" id="b-status" role="radiogroup" aria-label="Open or closed"></div>
+                        <p class="field-note" id="b-status-note"></p>
+                        <label class="field-label">Opened
+                            <select id="b-dates"></select>
+                        </label>
+                        <div class="date-range" id="b-range" hidden>
+                            <label>From <input type="date" id="b-from"></label>
+                            <label>To <input type="date" id="b-to"></label>
+                        </div>
+                        <p class="field-note" id="b-dates-note"></p>
+                        <div id="b-filters"></div>
+                        <button type="button" class="home-action" id="b-add-filter">＋ Only include some… (team, priority, state, …)</button>
+                    </fieldset>
+                    <fieldset>
+                        <legend>3. Group by</legend>
+                        <select id="b-group" aria-label="Group by"></select>
+                    </fieldset>
+                    <fieldset>
+                        <legend>4. Show it as</legend>
+                        <div class="display-picker" id="b-display" role="radiogroup" aria-label="Chart type"></div>
+                        <p class="field-note" id="b-display-note"></p>
+                        <div class="builder-row" id="b-cut">
+                            <label class="field-label" id="b-limit-wrap">Show
+                                <select id="b-limit"></select>
+                            </label>
+                            <!-- Ascending or descending, by count or by the groups (customize.js paintDisplay) -->
+                            <label class="field-label">Order
+                                <select id="b-sort"></select>
+                            </label>
+                        </div>
+                        <div class="builder-row" id="b-color-row">
+                            <span class="field-label-text">Color</span>
+                            <div class="swatch-row" id="b-colors" role="radiogroup" aria-label="Color"></div>
+                        </div>
+                        <div class="builder-row">
+                            <span class="field-label-text">Size</span>
+                            <div class="choice-row" id="b-sizes" role="radiogroup" aria-label="Size"></div>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>5. Title</legend>
+                        <input type="text" id="b-title" maxlength="80" aria-label="Title">
+                    </fieldset>
+                </div>
+                <div class="builder-preview">
+                    <div class="builder-preview-label">Preview</div>
+                    <div id="b-preview"></div>
+                    <p class="field-note" id="b-scope-note" hidden></p>
+                </div>
+            </div>
+            <div class="builder-foot">
+                <label class="builder-dest" id="b-dest-row" hidden>Save to <select id="b-dest"></select></label>
+                <button type="button" class="home-action" onclick="closeBuilder()">Cancel</button>
+                <button type="submit" class="primary-btn" id="b-save">Add chart</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- A small "name it" box (new dashboard, rename) -->
+    <dialog class="ask-dialog" id="ask-dialog">
+        <form method="dialog">
+            <h2 class="ask-title"></h2>
+            <label class="field-label"><span class="ask-label"></span>
+                <input type="text" id="ask-input" maxlength="60" required>
+            </label>
+            <div class="builder-foot">
+                <button type="button" class="home-action" onclick="this.closest('dialog').close('cancel')">Cancel</button>
+                <button type="submit" class="primary-btn" id="ask-ok" value="ok">Save</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Telling your project manager you resolved or closed a ticket (notifications.js) -->
+    <dialog class="ask-dialog report-dialog" id="report-dialog" aria-labelledby="report-title">
+        <form method="dialog">
+            <h2 id="report-title">Tell your project manager</h2>
+            <p class="report-ticket" id="report-ticket"></p>
+            <label class="field-label">What did you do?
+                <select id="report-status">
+                    <option value="resolved">I resolved it</option>
+                    <option value="closed">I closed it</option>
+                </select>
+            </label>
+            <label class="field-label">Note (optional)
+                <textarea id="report-note" rows="3" maxlength="500" placeholder="e.g. Restarted the service; the user confirmed it works"></textarea>
+            </label>
+            <p class="theme-note report-hint">This only sends your project manager a notification. The ticket itself doesn't change in OneTouch.</p>
+            <p class="home-status error" id="report-error" role="alert" hidden></p>
+            <div class="builder-foot">
+                <button type="button" class="home-action" onclick="this.closest('dialog').close('cancel')">Cancel</button>
+                <button type="submit" class="primary-btn" id="report-send" value="ok">Send</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Reporting a problem to the admins (notifications.js, issues.mjs) -->
+    <dialog class="ask-dialog report-dialog" id="issue-dialog" aria-labelledby="issue-title">
+        <form method="dialog">
+            <h2 id="issue-title">Report a problem</h2>
+            <p class="report-ticket">Tell the admins what went wrong. They get a notification and an email straight away.</p>
+            <label class="field-label">What kind of problem is it?
+                <select id="issue-category">
+                    <option value="broken">Something isn't working</option>
+                    <option value="data">The data looks wrong</option>
+                    <option value="access">I can't see or do something I should</option>
+                    <option value="slow">It's very slow</option>
+                    <option value="other">Something else</option>
+                </select>
+            </label>
+            <label class="field-label">What happened?
+                <textarea id="issue-message" rows="5" maxlength="2000" required placeholder="e.g. The Incidents dashboard stays blank since this morning"></textarea>
+            </label>
+            <p class="theme-note report-hint">Sent with your name, the page you're on and your browser. Please leave out passwords. What you write stays in OneTouch: the email only says what kind of problem it is.</p>
+            <p class="home-status error" id="issue-error" role="alert" hidden></p>
+            <div class="builder-foot">
+                <button type="button" class="home-action" onclick="this.closest('dialog').close('cancel')">Cancel</button>
+                <button type="submit" class="primary-btn" id="issue-send" value="ok">Send to the admins</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- The tickets behind a bar, slice, point or number of a chart -->
+    <dialog class="builder drill-dialog" id="drill-dialog" aria-labelledby="drill-title">
+        <div class="builder-head">
+            <h2 id="drill-title"></h2>
+            <button type="button" class="drawer-close" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+        </div>
+        <div class="drill-body" id="drill-body"></div>
+    </dialog>
+
+    <!-- One ticket over the page: its family first, then its record (families.js) -->
+    <dialog class="builder ticket-dialog" id="ticket-dialog" aria-labelledby="ticket-dialog-title">
+        <div class="builder-head">
+            <div class="ticket-dialog-nav">
+                <button type="button" class="home-action" id="ticket-dialog-back" onclick="ticketDialogBack()" hidden>← Back</button>
+                <h2 id="ticket-dialog-title"></h2>
+            </div>
+            <button type="button" class="drawer-close" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+        </div>
+        <div class="drill-body" id="ticket-dialog-body"></div>
+    </dialog>
+
+    <!-- Sharing one of your dashboards: its link -->
+    <dialog class="ask-dialog share-dialog" id="share-dialog" aria-labelledby="share-title">
+        <h2 id="share-title">Share this dashboard</h2>
+        <p class="share-text">Anyone who signs in to OneTouch can open this link, see the dashboard, and add a copy to
+            their own dashboards. When you change the dashboard, the link shows the change; copies people already added stay as they were.</p>
+        <div class="share-link">
+            <input type="text" id="share-link" readonly aria-label="Link to the dashboard">
+            <button type="button" class="primary-btn" onclick="copyShareLink()">Copy link</button>
+        </div>
+        <div class="builder-foot">
+            <button type="button" class="home-action danger" id="share-stop">Stop sharing</button>
+            <button type="button" class="home-action" onclick="this.closest('dialog').close()">Done</button>
+        </div>
+    </dialog>
+
+    <!-- A dashboard someone shared with you (opened from its link) -->
+    <dialog class="builder shared-dialog" id="shared-dialog" aria-labelledby="shared-title">
+        <div class="builder-head">
+            <h2 id="shared-title"></h2>
+            <button type="button" class="drawer-close" onclick="this.closest('dialog').close()" aria-label="Close">✕</button>
+        </div>
+        <div class="shared-body">
+            <p class="home-status" id="shared-about"></p>
+            <div class="tile-grid" id="shared-grid"></div>
+        </div>
+        <div class="builder-foot">
+            <button type="button" class="home-action" onclick="this.closest('dialog').close()">Close</button>
+            <button type="button" class="primary-btn" id="shared-add">＋ Add to my dashboards</button>
+        </div>
+    </dialog>
+
+    <!-- The tour: a spotlight on one part of the page, and what it does -->
+    <div class="tour" id="tour" hidden>
+        <div class="tour-blocker"></div>
+        <div class="tour-spot" id="tour-spot"></div>
+        <div class="tour-card" id="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title" aria-describedby="tour-text">
+            <div class="tour-step" id="tour-step"></div>
+            <h2 id="tour-title"></h2>
+            <p id="tour-text"></p>
+            <div class="tour-actions">
+                <button type="button" class="home-action" onclick="closeTour()">Skip the tour</button>
+                <span class="tour-spacer"></span>
+                <button type="button" class="home-action" id="tour-back" onclick="tourMove(-1)">Back</button>
+                <button type="button" class="primary-btn" id="tour-next" onclick="tourMove(1)">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="demo/mock-api.js"></script>
+    <script>
+        // Example questions for the assistant, some naming tickets that exist in this demo's data
+        (function () {
+            var ex = (window.ONETOUCH_DEMO || {}).examples || {};
+            var questions = [
+                'How many open incidents are there by priority?',
+                'Which teams have the most open incidents?',
+                'How many incidents were opened each week?',
+                'How many tickets of each type are open right now?',
+                'What are the top 5 most requested catalog items?',
+                'List the emergency changes',
+                'Show open catalog tasks that breached SLA',
+                ex.parent ? 'Show me the child incidents of ' + ex.parent : null,
+                ex.request ? 'Show me the catalog tasks for ' + ex.request : null,
+            ].filter(Boolean);
+            var box = document.getElementById('demo-examples');
+            box.innerHTML = questions.map(function (q) {
+                return '<button type="button" data-demo-question="' + q.replace(/"/g, '&quot;') + '">' + q + '</button>';
+            }).join('');
+            document.addEventListener('click', function (e) {
+                var b = e.target.closest && e.target.closest('[data-demo-question]');
+                if (!b) return;
+                document.getElementById('user-prompt').value = b.getAttribute('data-demo-question');
+                sendPrompt();
+            });
+        })();
+    </script>
+    <script src="sorting.js"></script>
+    <script src="lookup.js"></script>
+    <script src="picker.js"></script>
+    <script src="charts.js"></script>
+    <script src="customize.js"></script>
+    <script src="families.js"></script>
+    <script src="teams.js"></script>
+    <script src="notifications.js"></script>
+    <script src="accessibility.js"></script>
+    <script src="architecture.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

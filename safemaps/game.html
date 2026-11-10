@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Which Is Safer</title>
+    <meta name="theme-color" content="#0b7a53" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <script src="demo/demo.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <aside class="panel game" aria-label="Which route is safer?">
+        <header class="panel__header">
+          <div class="brand">
+            <img class="brand__mark" src="icons/icon.svg" alt="" />
+            <div>
+              <h1>Which route is safer?</h1>
+              <p class="tagline">Two real routes across Milwaukee. Pick the safer one.</p>
+            </div>
+          </div>
+          <nav class="header-links" aria-label="More">
+            <a class="chip chip--back" href="./">Plan your own trip</a>
+            <button id="lang" class="chip chip--lang" type="button" translate="no" lang="es">Español</button>
+          </nav>
+        </header>
+
+        <section class="game__round" aria-live="polite">
+          <p id="game-trip" class="game__trip"></p>
+          <p id="game-status" class="status">Finding two routes…</p>
+          <div class="game__choices">
+            <button id="pick-a" class="button game__pick game__pick--a" type="button" disabled>Route A is safer</button>
+            <button id="pick-b" class="button game__pick game__pick--b" type="button" disabled>Route B is safer</button>
+          </div>
+          <div id="game-reveal" class="game__reveal" hidden></div>
+          <button id="game-next" class="button button--primary" type="button" hidden>Next trip</button>
+        </section>
+
+        <p id="game-tally" class="game__tally"></p>
+        <p class="hint">
+          The safety score counts turns across oncoming traffic at busy or crash-prone junctions, railroad crossings,
+          school zones at school times, closed roads and lane closures, weather hazards and driving into a low sun.
+        </p>
+      </aside>
+
+      <section class="map-wrap">
+        <div id="map" class="map" role="application" aria-label="Map of the two routes"></div>
+        <div class="game__key" aria-hidden="true">
+          <span><span class="key game__key--a"></span>Route A</span>
+          <span><span class="key game__key--b"></span>Route B</span>
+        </div>
+      </section>
+    </main>
+    <script src="game.js" type="module"></script>
+  </body>
+</html>

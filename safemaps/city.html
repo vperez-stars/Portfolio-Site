@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Safe Route City</title>
+    <meta name="theme-color" content="#0b7a53" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <script src="demo/demo.js"></script>
+    <link rel="stylesheet" href="city/city.css" />
+  </head>
+  <body>
+    <div id="app">
+      <main id="stage">
+        <div class="labels"></div>
+        <div class="payload" hidden></div>
+        <div class="tip" hidden><b></b><small></small></div>
+        <header class="title-sign">
+          <span class="tab" title="The server runs on port 3143">EXIT 3143</span>
+          <div class="plate">
+            <h1>Safe Route City</h1>
+            <p>Every part of the Safe Route Planner, and how data travels between them.</p>
+          </div>
+        </header>
+        <div class="tools">
+          <a class="tool tool--back" href="./">Back to the planner</a>
+          <div class="seg" role="group" aria-label="Which map the server is set to">
+            <span>ROUTES_MAP</span>
+            <button type="button" id="map-google" aria-pressed="true">Google</button>
+            <button type="button" id="map-osm" aria-pressed="false">OpenStreetMap</button>
+          </div>
+          <button type="button" class="tool" id="pause">Pause traffic</button>
+          <button type="button" class="tool" id="reset">Whole city</button>
+        </div>
+      </main>
+      <nav id="key" aria-label="What each vehicle carries"></nav>
+      <aside id="panel">
+        <div class="tabs" role="tablist">
+          <button type="button" role="tab" id="tab-journeys" aria-selected="true">Journeys</button>
+          <button type="button" role="tab" id="tab-places" aria-selected="false">Places</button>
+        </div>
+        <div id="view" tabindex="-1"></div>
+      </aside>
+    </div>
+
+    <script src="vendor/three/three.min.js"></script>
+    <script src="vendor/three/OrbitControls.js"></script>
+    <script src="city/data.js"></script>
+    <script src="city/tours.js"></script>
+    <script src="city/models.js"></script>
+    <script src="city/world.js"></script>
+    <script src="city/traffic.js"></script>
+    <script src="city/engine.js"></script>
+    <script src="city/ui.js"></script>
+  </body>
+</html>
