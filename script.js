@@ -56,6 +56,9 @@ const STRINGS = {
     'skills.speak': 'Idiomas',
     'skills.en': 'Inglés',
     'skills.es': 'Español',
+    'skills.fr': 'Aprendiendo francés',
+    'skills.pt': 'Aprendiendo portugués',
+    'skills.it': 'Aprendiendo italiano',
 
     'projects.title': 'Proyectos',
     'projects.intro': 'Cosas que he construido. Cada una tiene una demo que puedes probar.',
