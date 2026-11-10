@@ -1,6 +1,9 @@
-This favicon was generated using the following font:
+Favicon: the VP monogram from the site header (.monogram in styles.css).
 
-- Font Title: Merriweather
-- Font Author: undefined
-- Font Source: https://fonts.gstatic.com/s/merriweather/v33/u-4D0qyriQwlOrhSvowK_l5UcA6zuSYEqOzpPe3HOZJ5eX1WtLaQwmYiScCmDxhtNOKl8yDrOSAqE1f0KvXKYQ.ttf
-- Font License: undefined)
+- White "VP" in Merriweather Black (900), letter-spacing -0.02em, on #2e2c55.
+- Text is 16/38.4 of the icon size; corners are rounded at 10/38.4 of the size.
+- apple-touch-icon.png has square corners, because iOS rounds them itself.
+- Font: Merriweather by Sorkin Type, SIL Open Font License (fonts.google.com/specimen/Merriweather).
+
+The same files are used by the SafeMaps demo (safemaps/icons/vp, built from
+routes/demo/static/icons) and the Guernica puzzle (guernica/assets/icons).
